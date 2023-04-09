@@ -1,7 +1,9 @@
 #!/bin/sh
 set -xe
 
-cargo run
+if [ $1 = "test" ]
+then cargo test
+fi
 
 rustup target add wasm32-unknown-unknown
 
@@ -13,10 +15,7 @@ then
   cargo install wasm-pack 
 fi
 
-if [ $1 = "prod" ]
-then wasm-pack build --target nodejs --release
-else wasm-pack build --target nodejs
-fi
+wasm-pack build --target nodejs --release
 
 cd www
 npm install

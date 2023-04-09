@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 use tl::*;
 use serde::{Serialize, Deserialize};
+use web_sys::console;
 
 const TODAY:&str = "Today";
 
@@ -12,28 +13,32 @@ pub fn find_today(input: &str) -> Result<JsValue, JsValue> {
 }
 
 pub fn parse(input: &str) -> Result<Vec<TimeOffDescription>, Box<dyn std::error::Error>>{
-    let html = vec![];
     let new_input = strip_comments(input);
     let dom = tl::parse(new_input.as_str(), ParserOptions::default()).unwrap_throw();
     let parser = dom.parser();
-    let nodes = dom.nodes();
+    let nodes = dom.query_selector("div").unwrap_throw();
     for node in nodes {
-        let html_tag = node.as_tag().unwrap_throw();
+        let html_tag = node.get(parser).unwrap_throw();
         let children = html_tag.children();
-        // find parent with today title
-        let is_parent = children.top().iter().any(|child| {
-            let child_node = child.get(parser).unwrap_throw();
-            child_node.inner_html(parser) == TODAY
-        });
-        if is_parent {
-            // parent=> node containing Today+rest of away info
-            let times = html_tag.children().all(parser).iter().filter_map(|node| {
-                find_list(node, parser)
-            }).collect();
-            return Ok(times);
+        if let Some(elems) = children {
+            let is_parent = elems.top().iter().any(|child| {
+                let child_node = child.get(parser).unwrap_throw();
+                child_node.inner_html(parser) == TODAY
+            });
+            if is_parent {
+                // parent=> node containing Today+rest of away info
+                let times = elems.all(parser).iter().filter_map(|node| {
+                    find_list(node, parser)
+                }).collect();
+                return Ok(times);
+            }
+        } else {
+            continue;
         }
+        // find parent with today title
     }
-    Ok(html) 
+    // console::log_1(&"Could not find Parent Node".into());
+    Err("Could not find Parent Node".into())
 }
 
 fn strip_comments(input: &str) -> String {
