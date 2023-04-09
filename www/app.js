@@ -33,37 +33,12 @@ app.event('app_mention', async ({event, client})=> {
 });
 
 // commands
-app.command('/asset/help', async ({ command, ack, respond})=>{
+app.command('/time_off/help', async ({ command, ack, respond})=>{
   try {
     await ack();
-    await respond("Insert help info");
-    console.log("works");
+    await respond("The Time Off Bot will remind you every weekday if anyone is off");
   } catch(e){
-  }
-});
-
-app.command('/asset/start', async ({ command, ack, respond}) => {
-  try {
-    await ack();
-    // enter channel id, channel name, team id
-    /**
-    db.connect( function(err) {
-      if (err) {
-        console.error(err);
-      };
-    });
-
-    db.query('SHOW TABLES', function(err, res, fields) {
-      if (err) throw err;
-      console.log('the solution is', res);
-    });
-
-    db.end();
-    **/
-    console.log(command.channel_id, command.team_id);
-    await respond('Done');
-  } catch(e){
-    
+    console.error(e);
   }
 });
 
