@@ -37,7 +37,7 @@ pub fn parse(input: &str) -> Result<Vec<TimeOffDescription>, Box<dyn std::error:
         }
         // find parent with today title
     }
-    // console::log_1(&"Could not find Parent Node".into());
+    console::log_1(&"Could not find Parent Node".into());
     Err("Could not find Parent Node".into())
 }
 
