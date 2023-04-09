@@ -1,0 +1,22 @@
+{
+  "name": "slack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@slack/bolt": "^3.8.1",
+    "node-fetch": "^2.6.7",
+    "wasm-build": "file:../pkg"
+  },
+  "devDependencies": {
+    "dotenv": "^13.0.1",
+    "nodemon": "^2.0.15"
+  }
+}
