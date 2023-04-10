@@ -29,7 +29,6 @@ app.event('app_mention', async ({event, client})=> {
   } catch(e){
     console.log(e);
   };
-  //console.log(event, content, context);
 });
 
 // commands
@@ -48,7 +47,7 @@ app.command('/time_off/help', async ({ command, ack, respond})=>{
   // Start your app
   await app.start(process.env.PORT || port);
   console.time('nav');
-  const html = await navigate('https://pptr.dev/api/puppeteer.page');
+  const html = await navigate('https://hr.humi.ca/login');
   console.timeEnd('nav');
   try {
     find_today(html);
