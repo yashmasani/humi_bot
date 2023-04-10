@@ -7,34 +7,22 @@ async function init(webAddress) {
 
   await page.goto(webAddress);
   
-  try {
-    const authenticatedPage = await authenticate(page);
-  } catch(e) {
-    console.error("Error Authenticating");
-    console.error(e);
-  }
-  const content = await authenticatedPage.content();
+  await authenticate(page);
+  const response = await page.waitForResponse(response => response.status() == 200);
+  let content = "";
+  if (response) content = page.content();
   return content;
 }
 
 async function authenticate(page) {
-  const inputs =  await page.querySelectorAll('input');
-  let email;
-  let password;
-  for await (const input of inputs) {
-    if (!email) {
-      email = await input.querySelector('[name="email"]');
-      await input.type(process.env.EMAIL);
-    }
-    if (!password) {
-      password = await input.querySelector('[name="password"]');
-      await input.type(process.env.PASSWORD);
-    }
-  }
+  let email = await page.$('input[name="email"]');
+  let password = await page.$('input[name="password"]');
   if (email && password) {
-    const submit = await page.querySelector('button[type="submit"]');
+    await email.type(process.env.EMAIL);
+    await password.type(process.env.PASSWORD);
+    const submit = await page.$('button[type="submit"]');
     if (submit) {
-      // await submit.click();
+      await submit.click();
     } else {
       throw new Error(`Could not find input element SUBMIT: ${submit}`);
     }
