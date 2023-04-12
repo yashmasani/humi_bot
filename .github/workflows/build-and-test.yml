@@ -1,0 +1,15 @@
+name: build-and-test
+on: [pull_request]
+jobs:
+  build-and-test-wasm
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+    - name: Build Rust
+      run: cargo build --verbose
+    - name: Test
+      run: cargo test --verbose
+    - name: Build Wasm
+      run: |
+        cargo install wasm-pack
+        wasm-pack build --target nodejs --release 
