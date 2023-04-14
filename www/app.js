@@ -50,7 +50,7 @@ app.command('/time_off/help', async ({ command, ack, respond})=>{
   const html = await navigate('https://hr.humi.ca/login');
   console.timeEnd('nav');
   try {
-    find_today(html);
+    console.log(find_today(html));
   } catch(e) {
     console.error(e);
     console.log('Cannot find today');
