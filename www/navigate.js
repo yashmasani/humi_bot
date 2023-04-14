@@ -8,7 +8,13 @@ async function init(webAddress) {
   await page.goto(webAddress);
   
   await authenticate(page)
-    .then(() => page.waitForNavigation({waitUntil: 'load'}));
+    .then(async () => {
+      try {
+        await page.waitForNavigation({waitUntil: 'networkidle0', timeout: 8000 })
+      } catch(e) {
+        console.error(e);
+      }
+    });
   let content = "";
   const page_url = page.url();
   if (page_url && page_url.includes('dashboard') ) content = await page.content();

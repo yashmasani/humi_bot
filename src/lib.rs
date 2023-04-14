@@ -23,7 +23,8 @@ pub fn parse(input: &str) -> Result<Vec<TimeOffDescription>, Box<dyn std::error:
         if let Some(elems) = children {
             let is_parent = elems.top().iter().any(|child| {
                 let child_node = child.get(parser).unwrap_throw();
-                child_node.inner_html(parser) == TODAY
+                let inner_html = child_node.inner_html(parser);
+                inner_html == TODAY
             });
             if is_parent {
                 // parent=> node containing Today+rest of away info
@@ -58,7 +59,7 @@ impl TimeOffDescription {
         let mut name = String::new();
         let mut time_away = String::new();
         for val in v {
-            if val.contains("day") {
+            if val.contains("Away for") {
                 time_away = val;
             } else if val.contains("away") {
                 name = val;
@@ -79,7 +80,10 @@ fn find_list(node: &Node, parser: &Parser) -> Option<TimeOffDescription> {
         if all_nodes.len() == 4 {
             all_nodes.iter().for_each(|html| {
                 let text = html.inner_text(parser);
-                v.push(text.to_string());
+                if !text.contains(&['>', '<']) {
+                    dbg!("{:?}", &text);
+                    v.push(text.to_string());
+                }
             });
             v.sort();
             v.dedup();
