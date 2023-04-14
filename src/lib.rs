@@ -109,5 +109,20 @@ mod tests {
             assert!(false);
         }
     }
+    #[test]
+    fn parse_web_components() {
+        let html = r#"<app-upcoming-events-viewer _ngcontent-hng-c427="" _nghost-hng-c418=""><div _ngcontent-hng-c418="" id="home-upcoming-events-viewer" class=""><div _ngcontent-hng-c418="" class="ng-star-inserted"><div _ngcontent-hng-c418="" class="day-container ng-star-inserted"><div _ngcontent-hng-c418="">Today</div><div _ngcontent-hng-c418="" class="upcoming-event ng-star-inserted"><div _ngcontent-hng-c418="" class="avatar-container"><app-avatar _ngcontent-hng-c418="" size="medium" _nghost-hng-c76=""><div _ngcontent-hng-c76="" class="circular image medium ui text ng-star-inserted" title="Ryan Pedro"><!----><span _ngcontent-hng-c76="" class="ng-star-inserted">RP</span><!----><!----></div><!----><!----></app-avatar></div><div _ngcontent-hng-c418="" class="upcoming-event-text-container"><div _ngcontent-hng-c418="" class="upcoming-event-title">Ryan Pedro is away  for part of the day</div><div _ngcontent-hng-c418="" class="upcoming-event-description">Away for 0.50 days</div></div></div><!----><!----><!----><!----></div><div _ngcontent-hng-c418="" class="day-container ng-star-inserted"><div _ngcontent-hng-c418="">Saturday, Apr 15</div><!----><!----><!----><div _ngcontent-hng-c418="" class="no-events ng-star-inserted"> No events on Saturday, Apr 15 </div><!----></div><div _ngcontent-hng-c418="" class="day-container ng-star-inserted"><div _ngcontent-hng-c418="">Sunday, Apr 16</div><div _ngcontent-hng-c418="" class="upcoming-event ng-star-inserted"><div _ngcontent-hng-c418="" class="avatar-container"><app-avatar _ngcontent-hng-c418="" size="medium" _nghost-hng-c76=""><div _ngcontent-hng-c76="" class="circular image medium ui text ng-star-inserted" title="Mahshid Yassaei"><!----><span _ngcontent-hng-c76="" class="ng-star-inserted">MY</span><!----><!----></div><!----><!----></app-avatar></div><div _ngcontent-hng-c418="" class="upcoming-event-text-container"><div _ngcontent-hng-c418="" class="upcoming-event-title">Mahshid Yassaei's birthday</div><div _ngcontent-hng-c418="" class="upcoming-event-description">Happy Birthday!</div></div></div><!----><!----><!----><!----></div><div _ngcontent-hng-c418="" class="day-container ng-star-inserted"><div _ngcontent-hng-c418="">Monday, Apr 17</div><!----><!----><!----><div _ngcontent-hng-c418="" class="no-events ng-star-inserted"> No events on Monday, Apr 17 </div><!----></div><div _ngcontent-hng-c418="" class="day-container ng-star-inserted"><div _ngcontent-hng-c418="">Tuesday, Apr 18</div><!----><!----><!----><div _ngcontent-hng-c418="" class="no-events ng-star-inserted"> No events on Tuesday, Apr 18 </div><!----></div><div _ngcontent-hng-c418="" class="day-container ng-star-inserted"><div _ngcontent-hng-c418="">Wednesday, Apr 19</div><!----><!----><!----><div _ngcontent-hng-c418="" class="no-events ng-star-inserted"> No events on Wednesday, Apr 19 </div><!----></div><div _ngcontent-hng-c418="" class="day-container ng-star-inserted"><div _ngcontent-hng-c418="">Thursday, Apr 20</div><!----><!----><!----><div _ngcontent-hng-c418="" class="no-events ng-star-inserted"> No events on Thursday, Apr 20 </div><!----></div><!----></div><!----></div></app-upcoming-events-viewer>"#;
+        let result = parse(html);
+        if let Ok(times) = result {
+            let expect = vec![TimeOffDescription { name: "Ryan Pedro is away  for part of the day".to_string(), time_away: "Away for 0.50 days".to_string() }];
+            assert_eq!(times.len(), expect.len());
+            for i in 0..times.len() {
+                assert_eq!(expect[i], times[i]);
+            }
+        } else {
+            dbg!("results is None type");
+            assert!(false);
+        }
+    }
 }
 
