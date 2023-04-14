@@ -7,10 +7,18 @@ async function init(webAddress) {
 
   await page.goto(webAddress);
   
-  await authenticate(page);
-  const response = await page.waitForResponse(response => response.status() == 200);
+  await authenticate(page)
+    .then(async () => {
+      try {
+        await page.waitForNavigation({waitUntil: 'networkidle0', timeout: 8000 })
+      } catch(e) {
+        console.error(e);
+      }
+    });
   let content = "";
-  if (response) content = page.content();
+  const page_url = page.url();
+  if (page_url && page_url.includes('dashboard') ) content = await page.content();
+  await browser.close();
   return content;
 }
 
