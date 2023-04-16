@@ -17,4 +17,12 @@ jobs:
       - name: Build Wasm
         run: |
           cargo install wasm-pack
-          wasm-pack build --target nodejs --release 
+          wasm-pack build --target nodejs --release
+      - name: use Node 16
+        uses: actions/setup-node@v3
+          with:
+            node-version: 16
+      - name: Test Server
+      - run: |
+          cd www
+          npm run test
