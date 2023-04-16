@@ -5,15 +5,9 @@ const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-// TIME IS 24HR
-// dayjs HOUR BETWEEN 0-23
-function convertToDayJS (x) {
-  return x - 1;
-}
-
 function schedule(date) {
-  const SCHEDULE = 10; //10AM in 23hr DAYJS
-  const dateAtSchedule = date.hour(convertToDayJS(SCHEDULE));
+  const SCHEDULE = 10; //10AM in 24hr
+  const dateAtSchedule = date.hour(SCHEDULE).minute(50);
   return dateAtSchedule.unix();
 }
 
@@ -24,8 +18,32 @@ function validateWebScrapingTime(date) {
   
   // weekday and expected time
   const isWeekDay = date.day() >= 1 && date.day() <= 5;
-  const betweenExpectedTime = date.hour() >= convertToDayJS(TIME_START) && date.hour() <= convertToDayJS(TIME_STOP);
+  const betweenExpectedTime = date.hour() >= TIME_START && date.hour() <= TIME_STOP;
   return isWeekDay && betweenExpectedTime;
 }
 
-module.exports = { schedule, validateWebScrapingTime };
+function calculateInterval(date) {
+  const targetTime = 8; // 8AM 
+  const target = date.startOf('day').hour(targetTime);
+  let interval;
+  const dateUnix = date.unix();
+  const targetUnix = target.unix();
+  if (dateUnix <= targetUnix) {
+    interval =  targetUnix - dateUnix;
+  } else {
+    const endOfDay = date.endOf('day').unix();
+    interval =  (endOfDay - dateUnix) + (targetTime * 3600);
+  }
+  //from s to ms
+  return interval * 1000;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, ms)
+  });
+}
+
+module.exports = { schedule, validateWebScrapingTime, calculateInterval, sleep };
