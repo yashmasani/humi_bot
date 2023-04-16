@@ -5,19 +5,21 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\""
+    "test": "mocha"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@slack/bolt": "^3.8.1",
+    "dayjs": "^1.11.7",
     "node-fetch": "^2.6.7",
     "puppeteer": "^19.8.5",
     "wasm-build": "file:../pkg"
   },
   "devDependencies": {
     "dotenv": "^13.0.1",
+    "mocha": "^10.2.0",
     "nodemon": "^2.0.15"
   }
 }
