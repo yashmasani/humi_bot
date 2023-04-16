@@ -7,7 +7,7 @@ dayjs.extend(timezone);
 
 function schedule(date) {
   const SCHEDULE = 10; //10AM in 24hr
-  const dateAtSchedule = date.hour(SCHEDULE).minute(50);
+  const dateAtSchedule = date.hour(SCHEDULE).minute(0);
   return dateAtSchedule.unix();
 }
 
@@ -22,8 +22,7 @@ function validateWebScrapingTime(date) {
   return isWeekDay && betweenExpectedTime;
 }
 
-function calculateInterval(date) {
-  const targetTime = 8; // 8AM 
+function calculateInterval(date, targetTime=8/*8AM*/) {
   const target = date.startOf('day').hour(targetTime);
   let interval;
   const dateUnix = date.unix();
@@ -31,7 +30,7 @@ function calculateInterval(date) {
   if (dateUnix <= targetUnix) {
     interval =  targetUnix - dateUnix;
   } else {
-    const endOfDay = date.endOf('day').unix();
+    const endOfDay = date.add(1, 'day').startOf('day').unix();
     interval =  (endOfDay - dateUnix) + (targetTime * 3600);
   }
   //from s to ms
