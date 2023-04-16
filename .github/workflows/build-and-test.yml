@@ -20,8 +20,8 @@ jobs:
           wasm-pack build --target nodejs --release
       - name: use Node 16
         uses: actions/setup-node@v3
-          with:
-            node-version: 16
+        with:
+          node-version: 16
       - name: Test Server
       - run: |
           cd www
