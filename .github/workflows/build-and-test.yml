@@ -22,7 +22,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Test Server
-      - run: |
-          cd www
-          npm run test
+      - run: cd www
+      - run: npm install
+      - run: npm test
