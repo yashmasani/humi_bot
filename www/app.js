@@ -45,29 +45,43 @@ app.command('/time_off/help', async ({ command, ack, respond})=>{
   }
 });
 
-async function runTimeOffEvents(startTime) {
+async function runTimeOffEvents() {
   let timeInterval = null;
-   
-  const date = dayjs().tz('America/Toronto');
-  if (validateWebScrapingTime(date) && !SCHEDULED_TIME) {
-    try {
-      console.time('nav');
-      const html = await navigate('https://hr.humi.ca/login');
-      console.timeEnd('nav');
-      console.log(find_today(html));
-    } catch(e) {
-      console.error(e);
+  const start_time = dayjs().tz('America/Toronto');
+  // calculate timeout ms
+  setInterval(() => {
+    const date = dayjs().tz('America/Toronto');
+    if (validateWebScrapingTime(date) && !SCHEDULED_TIME) {
+      try {
+        console.time('nav');
+        const html = await navigate('https://hr.humi.ca/login');
+        console.timeEnd('nav');
+        // const timeOff = find_today(html);
+        const timeOff = ['test'];
+        if (timeOff.length > 0 ) {
+          const post_at = schedule(date); 
+          //message 
+          await app.client.chat.scheduleMessage({
+            channel: process.env.CHANNEL_ID,
+            text: 'Tset Dome is away: Away for 1.00 day',
+            post_at
+          });
+        } else {
+          console.log('No Days off Today');
+        }
+      } catch(e) {
+        console.error(e);
+      }
     }
-  }
-  
+  }, 1000);
 }
 
 (async () => {
   const port = 3000
-  // Start your app
   try {
     await app.start(process.env.PORT || port);
-    console.log(`⚡️ Slack Bolt app is running on port ${port}!`);
+    console.log(`⚡️ Time off bot is running on port ${port}!`);
+    runTimeOffEvents(undefined);
   } catch(e) {
     console.error(e);
   }
