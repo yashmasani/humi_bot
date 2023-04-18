@@ -13,9 +13,17 @@ async function runTimeOffEvents(app, startTime, timeInterval) {
   const sleepTime = calculateInterval(startTime);
   console.log(sleepTime);
   await sleep(sleepTime);
+  const date = dayjs().tz('America/Toronto');
+  await postChatMessage(date, app);
   setInterval(async () => {
     const date = dayjs().tz('America/Toronto');
     console.log(date.locale());
+    await postChatMessage(date, app);
+  }, timeInterval);
+};
+
+
+async function postChatMessage(date, app) {
     if (validateWebScrapingTime(date)) {
       try {
         console.time('nav');
@@ -24,7 +32,13 @@ async function runTimeOffEvents(app, startTime, timeInterval) {
         const timeOff = find_today(html);
         // const timeOff = ['test'];
         if (timeOff.length > 0 ) {
-          await postChatMessage(date, app)
+          const post_at = schedule(date); 
+          //message 
+          await app.client.chat.scheduleMessage({
+            channel: process.env.CHANNEL_ID,
+            text: 'Tset Dome is away: Away for 1.00 day',
+            post_at
+          });
         } else {
           console.log('No Days off Today');
         }
@@ -32,18 +46,6 @@ async function runTimeOffEvents(app, startTime, timeInterval) {
         console.error(e);
       }
     }
-  }, timeInterval);
-};
-
-
-async function postChatMessage(date, app) {
-  const post_at = schedule(date); 
-  //message 
-  await app.client.chat.scheduleMessage({
-    channel: process.env.CHANNEL_ID,
-    text: 'Tset Dome is away: Away for 1.00 day',
-    post_at
-  });
 }
 
 module.exports = { runTimeOffEvents }
