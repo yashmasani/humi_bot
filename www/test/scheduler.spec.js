@@ -2,7 +2,7 @@ const assert = require('node:assert').strict;
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-const scheduler = require('../scheduler');
+const scheduler = require('../app/scheduler');
 
 describe('Scheduler', function() {
   dayjs.extend(utc);
