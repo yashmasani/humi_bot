@@ -12,13 +12,15 @@ async function runTimeOffEvents(app, startTime, timeInterval) {
   // calculate timeout ms
   const sleepTime = calculateInterval(startTime);
   console.log(sleepTime);
+  console.time('nav');
   await sleep(sleepTime);
+  console.timeEnd('nav');
   const date = dayjs().tz('America/Toronto');
   await postChatMessage(date, app);
-  setInterval(async () => {
+  return setInterval(() => {
     const date = dayjs().tz('America/Toronto');
     console.log(date.locale());
-    await postChatMessage(date, app);
+    postChatMessage(date, app);
   }, timeInterval);
 };
 
@@ -26,9 +28,7 @@ async function runTimeOffEvents(app, startTime, timeInterval) {
 async function postChatMessage(date, app) {
     if (validateWebScrapingTime(date)) {
       try {
-        console.time('nav');
         const html = await navigate('https://hr.humi.ca/login');
-        console.timeEnd('nav');
         const timeOff = find_today(html);
         // const timeOff = ['test'];
         if (timeOff.length > 0 ) {
@@ -48,4 +48,4 @@ async function postChatMessage(date, app) {
     }
 }
 
-module.exports = { runTimeOffEvents }
+module.exports = { runTimeOffEvents, postChatMessage }
