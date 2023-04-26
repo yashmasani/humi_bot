@@ -61,7 +61,7 @@ describe('Run Time Off Events', function() {
     });
   });
   describe('runTimeOffEvents works', function() {
-    it('RunTime Off Events is called as expected', async function() {
+    it('RunTime Off Events is called as expected when target time is before 8', async function() {
       let isCalledCount = 0;
       const mockNavInterval = 100;
       mockModule.__set__('navigate', () => (slp(mockNavInterval)));
@@ -78,7 +78,8 @@ describe('Run Time Off Events', function() {
         }
       };
       const buffer = 50;
-      const mockStartTime = 0;
+      // less than target time
+      const mockStartTime = { hour: () => (2) };
       const mockTimeInterval = 500;
       const interv = await mockModule.runTimeOffEvents(mockApp, mockStartTime, mockTimeInterval);
       assert.equal(isCalledCount, 1);
@@ -88,7 +89,7 @@ describe('Run Time Off Events', function() {
       assert.equal(isCalledCount, 3);
       clearInterval(interv);
     });
-    it('RunTime Off Events is called with expected date', async function() {
+    it('RunTime Off Events is called with expected date with time before 8', async function() {
       let isCalledCount = 0;
       const mockNavInterval = 100;
       mockModule.__set__('navigate', () => (slp(mockNavInterval)));
@@ -109,6 +110,29 @@ describe('Run Time Off Events', function() {
       const date = Date.parse('2023-04-15T07:59:58-04:00');
       const interv = await mockModule.runTimeOffEvents(mockApp, dayjs(date), mockTimeInterval);
       assert.equal(isCalledCount, 1);
+      clearInterval(interv);
+    });
+    it('RunTime Off Events is called with expected date with time between 8-10am', async function() {
+      let isCalledCount = 0;
+      const mockNavInterval = 100;
+      mockModule.__set__('navigate', () => (slp(mockNavInterval)));
+      mockModule.__set__('calculateInterval', () => (500));
+      mockModule.__set__('validateWebScrapingTime', () => (true))
+      mockModule.__set__('schedule', mockFunction);
+      mockModule.__set__('find_today', () => ['']);
+      mockModule.__set__('setInterval', mockSetInterval);
+      const mockApp = {
+        client: {
+          chat: {
+            scheduleMessage: () => slp(10, () => { isCalledCount += 1; })
+          }
+        }
+      };
+      const mockStartTime = 0;
+      const mockTimeInterval = 500;
+      const date = Date.parse('2023-04-15T08:59:58-04:00');
+      const interv = await mockModule.runTimeOffEvents(mockApp, dayjs(date), mockTimeInterval);
+      assert.equal(isCalledCount, 2);
       clearInterval(interv);
     });
   });
