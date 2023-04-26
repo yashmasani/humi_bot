@@ -5,9 +5,8 @@ const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-function schedule(date) {
-  const SCHEDULE = 10; //10AM in 24hr
-  const dateAtSchedule = date.hour(SCHEDULE).minute(0);
+function schedule(date, scheduled_time=10) {
+  const dateAtSchedule = date.hour(scheduled_time).minute(0);
   return dateAtSchedule.unix();
 }
 
