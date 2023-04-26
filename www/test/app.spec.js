@@ -132,7 +132,7 @@ describe('Run Time Off Events', function() {
       const mockTimeInterval = 500;
       const date = Date.parse('2023-04-15T08:59:58-04:00');
       const interv = await mockModule.runTimeOffEvents(mockApp, dayjs(date), mockTimeInterval);
-      assert.equal(isCalledCount, 2);
+      assert.equal(isCalledCount, 2, dayjs(date).toString());
       clearInterval(interv);
     });
   });
