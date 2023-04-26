@@ -2,6 +2,11 @@
 const rewire = require('rewire');
 const dayjs = require('dayjs');
 const assert = require('node:assert').strict;
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const mockModule = rewire("../app/helper");
 
@@ -108,7 +113,7 @@ describe('Run Time Off Events', function() {
       const mockStartTime = 0;
       const mockTimeInterval = 500;
       const date = Date.parse('2023-04-15T07:59:58-04:00');
-      const interv = await mockModule.runTimeOffEvents(mockApp, dayjs(date), mockTimeInterval);
+      const interv = await mockModule.runTimeOffEvents(mockApp, dayjs(date).tz('America/Toronto'), mockTimeInterval);
       assert.equal(isCalledCount, 1);
       clearInterval(interv);
     });
@@ -131,8 +136,8 @@ describe('Run Time Off Events', function() {
       const mockStartTime = 0;
       const mockTimeInterval = 500;
       const date = Date.parse('2023-04-15T08:59:58-04:00');
-      const interv = await mockModule.runTimeOffEvents(mockApp, dayjs(date), mockTimeInterval);
-      assert.equal(isCalledCount, 2, dayjs(date).toString());
+      const interv = await mockModule.runTimeOffEvents(mockApp, dayjs(date).tz('America/Toronto'), mockTimeInterval);
+      assert.equal(isCalledCount, 2, dayjs(date).tz('America/Toronto').toString());
       clearInterval(interv);
     });
   });
