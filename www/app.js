@@ -43,6 +43,24 @@ app.command('/time_off/help', async ({ command, ack, respond})=>{
   }
 });
 
+app.command('/time_off/attribution', async ({ ack, say })=>{
+  try {
+    await ack();
+    await say({
+     blocks: [
+      {
+       "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "Thanks to <https://www.vecteezy.com/?utm_source=vecteezy-download&utm_medium=license-info-pdf&utm_campaign=license-info-document | Vecteezy.com> for the clipart"
+        }
+      }
+    ]});
+  } catch(e){
+    console.error(e);
+  }
+});
+
 
 (async () => {
   const port = 3000
