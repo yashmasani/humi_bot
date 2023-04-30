@@ -1,6 +1,6 @@
 const navigate = require('./navigate');
 const { schedule, validateWebScrapingTime, calculateInterval, sleep } = require('./scheduler');
-const { find_today } = require("wasm-build");
+const { find_today, render_mkdown } = require("wasm-build");
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
@@ -38,14 +38,14 @@ async function postChatMessage(date, app) {
     if (validateWebScrapingTime(date)) {
       try {
         const html = await navigate('https://hr.humi.ca/login');
-        const timeOff = find_today(html);
+        const timeOff = render_mkdown(html);
         // const timeOff = ['test'];
         if (timeOff.length > 0 ) {
           const post_at = schedule(date, SCHEDULE); 
           //message 
           await app.client.chat.scheduleMessage({
             channel: process.env.CHANNEL_ID,
-            text: 'Tset Dome is away: Away for 1.00 day',
+            text: timeOff,
             post_at
           });
         } else {
@@ -56,5 +56,6 @@ async function postChatMessage(date, app) {
       }
     }
 }
+
 
 module.exports = { runTimeOffEvents, postChatMessage }

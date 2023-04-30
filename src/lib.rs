@@ -2,15 +2,77 @@ use wasm_bindgen::prelude::*;
 use tl::*;
 use serde::{Serialize, Deserialize};
 use web_sys::console;
+use js_sys::Date;
 
 const TODAY:&str = "Today";
 
+const EMOTES_TRAVEL: [&str; 4] = [
+    "\u{1F6EC}",
+    "\u{1FA82}",
+    "\u{1F681}",
+    "\u{1F680}"
+];
+
+const EMOTES: [&str; 4] = [
+    "\u{1F3DD}",
+    "\u{1F305}",
+    "\u{1F306}",
+    "\u{2600}"
+];
+/*
+ * Returns an array of TimeOffDescription
+ * */
 #[wasm_bindgen]
 pub fn find_today(input: &str) -> Result<JsValue, JsValue> {
     let raw_html = parse(input).unwrap_throw();
     println!("{:?}", raw_html);
     Ok(serde_wasm_bindgen::to_value(&raw_html)?)
 }
+
+pub fn random(start:u8, stop:u8, day_index: u32 ) -> u8 {
+    for i in (start..=stop).rev() {
+        let div = day_index % i as u32;
+        if div == 0 {
+            return i;
+        }
+    }
+    return start;
+}
+
+
+/*
+ * Uses an array of TimeOffDescription to generate mkdown text
+ * */
+#[wasm_bindgen]
+pub fn render_mkdown(input: &str) -> Result<String, JsValue>{
+    let time_off = parse(input).unwrap_throw();
+    let mut mkdown = String::new();
+    const SEARCH_TERM: &str = "is away";
+    let rand_iter = vec![1, 2, 3, 4];
+    let rand = random(1, 4, Date::new_0().get_day());
+    let mut rand_index = rand_iter.iter().position(|x| *x == rand).unwrap_or(0);
+    for person in time_off {
+        let name = person.name.as_str().split(SEARCH_TERM).nth(0);
+        let time_away = person.time_away;
+        if let Some(n) = name {
+            if time_away.contains("from") {
+                let emote = EMOTES_TRAVEL[rand_index];
+                mkdown.push_str(format!("{} → {} {}", n, time_away, emote).as_str());
+            } else {
+                let emote = EMOTES[rand_index];
+                mkdown.push_str(format!("{} → {} {}", n, time_away, emote).as_str());
+            }
+            mkdown.push_str("\n");
+        }
+        rand_index += 1;
+        if rand_index == rand_iter.len() {
+            rand_index = 0;
+        }
+    }
+    Ok(mkdown)
+}
+
+
 
 pub fn parse(input: &str) -> Result<Vec<TimeOffDescription>, Box<dyn std::error::Error>>{
     let new_input = strip_comments(input);
@@ -60,6 +122,8 @@ impl TimeOffDescription {
         let mut time_away = String::new();
         for val in v {
             if val.contains("Away for") {
+                time_away = val;
+            } else if val.contains("Away from") {
                 time_away = val;
             } else if val.contains("away") {
                 name = val;
@@ -127,6 +191,18 @@ mod tests {
             dbg!("results is None type");
             assert!(false);
         }
+    }
+    #[test]
+    fn random_test() {
+        let actual = random(1, 4, 4);
+        let expect = 4;
+        assert_eq!(actual, expect);
+        let actual = random(1, 4, 2);
+        let expect = 2;
+        assert_eq!(actual, expect);
+        let actual = random(1, 10, 5);
+        let expect = 5;
+        assert_eq!(actual, expect);
     }
 }
 

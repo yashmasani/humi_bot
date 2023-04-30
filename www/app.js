@@ -3,7 +3,8 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 require("dotenv").config();
-const { runTimeOffEvents } = require('./app/helper');
+const { runTimeOffEvents, postChatMessage } = require('./app/helper');
+const { render_mkdown } = require("wasm-build");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
