@@ -33,6 +33,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('validateWebScrapingTime', () => (true))
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
+      mockModule.__set__('render_mkdown', () => 'test');
       let isCalled = false;
       const mockApp = {
         client: {
@@ -51,6 +52,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('validateWebScrapingTime', () => (false))
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
+      mockModule.__set__('render_mkdown', () => 'test');
       let isCalled = false;
       const mockApp = {
         client: {
@@ -74,6 +76,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('validateWebScrapingTime', () => (true))
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
+      mockModule.__set__('render_mkdown', () => 'test');
       mockModule.__set__('setInterval', mockSetInterval);
       const mockApp = {
         client: {
@@ -102,6 +105,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('validateWebScrapingTime', () => (true))
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
+      mockModule.__set__('render_mkdown', () => 'test');
       mockModule.__set__('setInterval', mockSetInterval);
       const mockApp = {
         client: {
@@ -125,6 +129,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('validateWebScrapingTime', () => (true))
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
+      mockModule.__set__('render_mkdown', () => 'test');
       mockModule.__set__('setInterval', mockSetInterval);
       const mockApp = {
         client: {
