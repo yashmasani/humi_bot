@@ -4,8 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon app.js",
-    "test": "mocha --timeout 5000 --exit"
+    "dev": "NODE_ENV=development nodemon app.js",
+    "test": "mocha --timeout 5000 --exit",
+    "prod": "NODE_ENV=production node app.js"
   },
   "keywords": [],
   "author": "",
