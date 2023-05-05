@@ -3,8 +3,7 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 require("dotenv").config();
-const { runTimeOffEvents, postChatMessage } = require('./app/helper');
-const { render_mkdown } = require("wasm-build");
+const { runTimeOffEvents } = require('./app/helper');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -64,10 +63,12 @@ app.command('/time_off/attribution', async ({ ack, say })=>{
 
 (async () => {
   const port = 3000
+  console.log(process.env.PORT);
   try {
     await app.start(process.env.PORT || port);
     console.log(`⚡️ Time off bot is running on port ${port}!`);
     const startTime = dayjs().tz('America/Toronto');
+    // 24 hr in ms
     const timeInterval = 8.64e7;
     runTimeOffEvents(app, startTime, timeInterval);
   } catch(e) {
