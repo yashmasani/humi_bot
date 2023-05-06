@@ -62,8 +62,7 @@ app.command('/time_off/attribution', async ({ ack, say })=>{
 
 
 (async () => {
-  const port = 3000
-  console.log(process.env.PORT);
+  const port = process.env.PORT || 3000;
   try {
     await app.start(process.env.PORT || port);
     console.log(`⚡️ Time off bot is running on port ${port}!`);
