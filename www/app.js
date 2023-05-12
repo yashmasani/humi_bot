@@ -3,11 +3,15 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 require("dotenv").config();
-const { runTimeOffEvents } = require('./app/helper');
+const { runTimeOffEvents, installationStore } = require('./app/helper');
+const { getTable } = require('./app/db');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 // Initializes your app with your bot token and signing secret
+
+
+const db = getTable();
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -20,7 +24,8 @@ const app = new App({
         res.end(`Things are going just fine at ${req.headers.host}!`);
       },
     }
-  ]
+  ],
+  installationStore: installationStore(db)
   /*socketMode: true,
   appToken: process.env.APP_TOKEN,*/
 });
