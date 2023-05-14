@@ -59,28 +59,31 @@ async function postChatMessage(date, app) {
 }
 
 const installationStore = (db) => ({
-    storeInstallation: (installation) => {
+    storeInstallation: async (installation) => {
       // Bolt will pass your handler an installation object
       if (installation.team !== undefined) {
         // single team app installation
-        return saveInstall(db, installation);
+        const database = await db;
+        return saveInstall(database, installation);
       }
-      console.error('Failed saving installation data to installationStore');
+      throw new Error('Failed saving installation data to installationStore');
     },
-    fetchInstallation: (installQuery) => {
+    fetchInstallation: async (installQuery) => {
       // Bolt will pass your handler an installQuery object
       if (installQuery.teamId !== undefined) {
         // single team app installation lookup
-        return getInstall(db, installQuery.teamId);
+        const database = await db;
+        return getInstall(database, installQuery.teamId);
       }
-      console.error('Failed fetching installation');
+      throw new Error('Failed fetching installation');
     },
-    deleteInstallation: (installQuery) => {
+    deleteInstallation: async (installQuery) => {
       if (installQuery.teamId !== undefined) {
         // single team app installation deletion
-        return delInstall(db, installQuery.teamId);
+        const database = await db;
+        return delInstall(database, installQuery.teamId);
       }
-      console.error('Failed to delete installation');
+      throw new Error('Failed to delete installation');
     }
 });
 

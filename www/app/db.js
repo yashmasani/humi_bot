@@ -1,34 +1,46 @@
 const sqlite3 = require('sqlite3').verbose();
 
 function getTable() {
-  try {
-    const db = new sqlite3.Database(':memory:');
-    db.run(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY NOT NULL,
-        installation TEXT NOT NULL,
-        team_id TEXT NOT NULL,
-        channel TEXT
-      )`
-    );
-  } catch(e) {
-    console.error('Unable to start db');
-    console.error(e);
-  }
-  // create the table
-  return db;
+  return new Promise((resolve, reject) => {
+    const db = new sqlite3.Database(':memory:', function(err) {
+      if (err) {
+        console.error(err);
+        resolve(undefined);
+      } else {
+        db.run(`
+          CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY NOT NULL,
+            installation TEXT NOT NULL,
+            team_id TEXT NOT NULL,
+            channel TEXT
+          )`, function(err) {
+            if (err) {
+              console.error(err);
+              reject('Unable to create table');
+            } else {
+              resolve(db);
+            };
+          }
+        );
+      }
+    });
+  });
 }
 
 function saveInstall(db, installationItem) {
-  if (installationItem && installationItem.team && installation.token && installation.id) {
+  if (installationItem && installationItem.team && installationItem.bot.token && installationItem.team.id) {
     db.run(`
-      INSERT INTO users(installation)
-      VALUES (?)
+      INSERT INTO users(installation, team_id)
+      VALUES (?, ?)
     `, JSON.stringify(installationItem),
-    function(err) {
-      console.error('Unable to authenticate installation');
-      console.error(err);
-    });
+      installationItem.team.id,  
+      function(err) {
+        if (err) {
+          console.error('Unable to add installation');
+          console.error(err);
+        }
+      }
+    );
   }
 }
 
@@ -41,7 +53,7 @@ function getInstall(db, teamId) {
       } else if (row && !row.installation) {
         console.error('Non valid Installation Item');
       } else {
-        return row.installation;
+        return JSON.parse(row.installation);
       }
     })
   }
