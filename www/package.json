@@ -17,6 +17,7 @@
     "node-fetch": "^2.6.7",
     "puppeteer": "^19.8.5",
     "rewire": "^6.0.0",
+    "sqlite3": "^5.1.6",
     "wasm-build": "file:../pkg"
   },
   "devDependencies": {

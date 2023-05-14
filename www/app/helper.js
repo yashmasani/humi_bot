@@ -1,5 +1,6 @@
 const navigate = require('./navigate');
 const { schedule, validateWebScrapingTime, calculateInterval, sleep } = require('./scheduler');
+const { saveInstall, getInstall, delInstall } = require('./db');
 const { find_today, render_mkdown } = require("wasm-build");
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -57,5 +58,37 @@ async function postChatMessage(date, app) {
     }
 }
 
+const installationStore = (db) => ({
+    storeInstallation: async (installation) => {
+      // Bolt will pass your handler an installation object
+      if (installation.team !== undefined) {
+        // single team app installation
+        const database = await db;
+        return await saveInstall(database, installation);
+      }
+      throw new Error('Failed saving installation data to installationStore');
+    },
+    fetchInstallation: async (installQuery) => {
+      // Bolt will pass your handler an installQuery object
+      if (installQuery.teamId !== undefined) {
+        // single team app installation lookup
+        const database = await db;
+        return await getInstall(database, installQuery.teamId);
+      }
+      throw new Error('Failed fetching installation');
+    },
+    deleteInstallation: async (installQuery) => {
+      if (installQuery.teamId !== undefined) {
+        // single team app installation deletion
+        const database = await db;
+        return await delInstall(database, installQuery.teamId);
+      }
+      throw new Error('Failed to delete installation');
+    }
+});
 
-module.exports = { runTimeOffEvents, postChatMessage }
+module.exports = {
+  runTimeOffEvents,
+  postChatMessage,
+  installationStore
+}
