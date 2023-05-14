@@ -64,7 +64,7 @@ const installationStore = (db) => ({
       if (installation.team !== undefined) {
         // single team app installation
         const database = await db;
-        return saveInstall(database, installation);
+        return await saveInstall(database, installation);
       }
       throw new Error('Failed saving installation data to installationStore');
     },
@@ -73,7 +73,7 @@ const installationStore = (db) => ({
       if (installQuery.teamId !== undefined) {
         // single team app installation lookup
         const database = await db;
-        return getInstall(database, installQuery.teamId);
+        return await getInstall(database, installQuery.teamId);
       }
       throw new Error('Failed fetching installation');
     },
@@ -81,7 +81,7 @@ const installationStore = (db) => ({
       if (installQuery.teamId !== undefined) {
         // single team app installation deletion
         const database = await db;
-        return delInstall(database, installQuery.teamId);
+        return await delInstall(database, installQuery.teamId);
       }
       throw new Error('Failed to delete installation');
     }

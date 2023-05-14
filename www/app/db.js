@@ -28,45 +28,58 @@ function getTable() {
 }
 
 function saveInstall(db, installationItem) {
-  if (installationItem && installationItem.team && installationItem.bot.token && installationItem.team.id) {
-    db.run(`
-      INSERT INTO users(installation, team_id)
-      VALUES (?, ?)
-    `, JSON.stringify(installationItem),
-      installationItem.team.id,  
-      function(err) {
-        if (err) {
-          console.error('Unable to add installation');
-          console.error(err);
+  return new Promise((resolve, reject) => {
+    if (installationItem && installationItem.team && installationItem.bot.token && installationItem.team.id) {
+      db.run(`
+        INSERT INTO users(installation, team_id)
+        VALUES (?, ?)
+      `, JSON.stringify(installationItem),
+        installationItem.team.id,  
+        function(err) {
+          if (err) {
+            reject('Unable to add installation');
+          } else {
+            resolve();
+          }
         }
-      }
-    );
-  }
+      );
+    } else {
+      reject('Installation item did not contain core items');
+    }
+  });
 }
 
 function getInstall(db, teamId) {
-  if (teamId) {
-    db.get('SELECT installation FROM users WHERE team_id=?', teamId, function(err, row) {
-      if (!err || !row) {
-        console.error('Unable to get installation item');
-        console.error(err);
-      } else if (row && !row.installation) {
-        console.error('Non valid Installation Item');
-      } else {
-        return JSON.parse(row.installation);
-      }
-    })
-  }
+  return new Promise((resolve, reject) => {
+    if (teamId) {
+      db.get('SELECT installation FROM users WHERE team_id=?', teamId, function(err, row) {
+        if (err || !row) {
+          console.error('Unable to get installation item');
+          reject(err);
+        } else {
+          const installation = JSON.parse(row.installation);
+          resolve(installation);
+        }
+      });
+    };
+  });
 }
 
 function delInstall(db, teamId) {
-  if (teamId) {
-    db.run('DELETE FROM users WHERE team_id=?', teamId, function(err) {
-      if(err) {
-        console.error(e);
-      }
-    });
-  }
+  return new Promise((resolve, reject) => {
+    if (teamId) {
+      db.run('DELETE FROM users WHERE team_id=?', teamId, function(err) {
+        if(err) {
+          console.error('Unable to delete install');
+          reject(err);
+        } else {
+          resolve(true);
+        }
+      });
+    } else {
+      reject('Team id undefined');
+    }
+  });
 }
 
 

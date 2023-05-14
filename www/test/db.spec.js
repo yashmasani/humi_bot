@@ -15,13 +15,10 @@ describe('DB', function() {
       'SELECT * FROM users',
       function(err, row) {
         assert.ifError(err);
-        console.log(row);
       }
     );
   });
-  /*describe('installs', function() {
-    const db = getTable();
-    describe('saveInstall', function(){
+  describe('installs', function() {
       const mockInstallObject = {
         team: { id: 'T012345678', name: 'example-team-name' },
         enterprise: undefined,
@@ -39,15 +36,51 @@ describe('DB', function() {
           id: 'B01234567'
         }
       };
-      const res = saveInstall(db, mockInstallObject);
-      console.log(res);
-      assert.equal(res, true, 'Save Install Error');
+    it('saveInstall', async function(){
+      const db = await getTable();
+      await saveInstall(db, mockInstallObject);
+      await db.get('SELECT * FROM users', function(err, row) {
+        assert.equal(row.id, 1, 'row ID error');
+        assert.equal(row.channel, null, 'channel should not be populated');
+        assert.equal(row.installation, JSON.stringify(mockInstallObject));
+      });
     });
-  });*/
+    it('getInstall', async function(){
+      const db = await getTable();
+      await saveInstall(db, mockInstallObject);
+      const parsedMockInstallationObj = JSON.parse(JSON.stringify(mockInstallObject));
+      const installationObject = await getInstall(db, parsedMockInstallationObj.team.id);
+      assert.equal(Object.keys(parsedMockInstallationObj).length, Object.keys(installationObject).length);
+      for (const key of Object.keys(parsedMockInstallationObj)) {
+        if (typeof parsedMockInstallationObj[key] === 'object') {
+          assert.equal(JSON.stringify(parsedMockInstallationObj[key]), JSON.stringify(installationObject[key]));
+        } else {
+          assert.equal(parsedMockInstallationObj[key], installationObject[key]);
+        }
+      }
+    });
+    it('delInstall', async function(){
+      const db = await getTable();
+      await saveInstall(db, mockInstallObject);
+      const installationObject = await getInstall(db, mockInstallObject.team.id);
+      assert.equal(installationObject.team.id, mockInstallObject.team.id);
+      console.log(mockInstallObject.team.id);
+      const res = await delInstall(db, mockInstallObject.team.id);
+      assert.equal(res, true);
+    });
+    after(function(){
+      db.run('DROP TABLE IF EXISTS users', function(err){
+        if (err) {
+          console.error(err);
+          assert.ifError(err);
+        }
+      });
+    });
+  });
   after(function(){
     db.run('DROP TABLE IF EXISTS users', function(err){
       if (err) {
-        console.error(err, 123);
+        console.error(err);
         assert.ifError(err);
       }
     });
