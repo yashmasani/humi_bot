@@ -14,10 +14,12 @@ RUN mkdir ./humi_bot-main
 RUN unzip main.zip -d ./
 RUN rm -rf main.zip
 RUN ls ./humi_bot-main
+RUN cd humi_bot-main
+WORKDIR humi_bot-main
 #COPY humi_bot-main/src ./src
 #COPY humi_bot-main/Cargo.toml ./Cargo.toml
-# RUN wasm-pack build --target nodejs --release
-# RUN mkdir www
+RUN wasm-pack build --target nodejs --release
+#RUN mkdir www
 # COPY www/app ./www/app
 # COPY www/app.js ./www/app.js
 # COPY www/package.json ./www/package.json
@@ -25,7 +27,9 @@ RUN ls ./humi_bot-main
 # 
 #RUN
 FROM node:16.17.0-bullseye-slim
-COPY --from=wasm-builder humi_bot-main .
+COPY --from=wasm-builder humi_bot-main /bot
+RUN cd bot
+WORKDIR bot
 RUN cd www
 WORKDIR www
 
