@@ -13,8 +13,11 @@ dayjs.extend(timezone);
 
 const db = getTable();
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
+  clientId: process.env.SLACK_CLIENT_ID,
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
+  stateSecret: process.env.SLACK_STATE_SECRET,
+  scopes: ['app_mentions:read', 'chat:write', 'commands'],
   customRoutes: [
     {
       path: '/health-check',

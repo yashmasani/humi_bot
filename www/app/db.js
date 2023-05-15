@@ -2,7 +2,8 @@ const sqlite3 = require('sqlite3').verbose();
 
 function getTable() {
   return new Promise((resolve, reject) => {
-    const db = new sqlite3.Database(':memory:', function(err) {
+    const dbFile = process.env.NODE_ENV === 'production' ? process.env.DB : ':memory:';
+    const db = new sqlite3.Database(dbFile || ':memory:', function(err) {
       if (err) {
         console.error(err);
         resolve(undefined);
