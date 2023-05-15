@@ -3,23 +3,29 @@
 #BUILD
 FROM rust:1.69 as wasm-builder
 LABEL maintainer="https://github.com/yashmasani"
-
+#
 RUN rustup target add wasm32-unknown-unknown
 RUN rustup default nightly 
 RUN cargo install wasm-pack
-WORKDIR /bot
-COPY src ./src
-COPY Cargo.toml ./Cargo.toml
-RUN wasm-pack build --target nodejs --release
-RUN mkdir www
-COPY www/app ./www/app
-COPY www/app.js ./www/app.js
-COPY www/package.json ./www/package.json
-COPY www/package-lock.json ./www/package-lock.json
-
+RUN mkdir bot
+#WORKDIR /bot
+RUN curl -LO https://github.com/yashmasani/humi_bot/archive/refs/heads/main.zip
+RUN mkdir ./humi_bot-main
+RUN unzip main.zip -d ./
+RUN rm -rf main.zip
+RUN ls ./humi_bot-main
+#COPY humi_bot-main/src ./src
+#COPY humi_bot-main/Cargo.toml ./Cargo.toml
+# RUN wasm-pack build --target nodejs --release
+# RUN mkdir www
+# COPY www/app ./www/app
+# COPY www/app.js ./www/app.js
+# COPY www/package.json ./www/package.json
+# COPY www/package-lock.json ./www/package-lock.json
+# 
 #RUN
 FROM node:16.17.0-bullseye-slim
-COPY --from=wasm-builder /bot .
+COPY --from=wasm-builder humi_bot-main .
 RUN cd www
 WORKDIR www
 
