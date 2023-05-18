@@ -1,11 +1,17 @@
 const navigate = require('./navigate');
 const { schedule, validateWebScrapingTime, calculateInterval, sleep } = require('./scheduler');
-const { saveInstall, getInstall, delInstall } = require('./db');
+const {
+  db,
+  saveInstall,
+  getInstall,
+  delInstall
+} = require('./db');
 const { find_today, render_mkdown } = require("wasm-build");
+
+
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -42,12 +48,20 @@ async function postChatMessage(date, app) {
         const timeOff = render_mkdown(html);
         // const timeOff = ['test'];
         if (timeOff.length > 0 ) {
-          const post_at = schedule(date, SCHEDULE); 
+          const post_at = schedule(date, SCHEDULE);
+          const { installation } = await getInstall(db, process.env.TEAM_ID);
+          const { bot }  = installation;
+          if (!bot && !bot.token) {
+            throw new Error('Bot Token not found');
+          };
+          const { token } = bot;
           //message 
           await app.client.chat.scheduleMessage({
             channel: process.env.CHANNEL_ID,
             text: timeOff,
-            post_at
+            post_at,
+            token,
+            team_id: process.env.TEAM_ID
           });
         } else {
           console.log('No Days off Today');
