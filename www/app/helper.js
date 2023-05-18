@@ -59,8 +59,9 @@ async function postChatMessage(date, app) {
           await app.client.chat.scheduleMessage({
             channel: process.env.CHANNEL_ID,
             text: timeOff,
+            post_at,
             token,
-            post_at
+            team_id: process.env.TEAM_ID
           });
         } else {
           console.log('No Days off Today');
