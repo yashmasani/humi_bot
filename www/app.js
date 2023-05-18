@@ -4,14 +4,14 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 require("dotenv").config();
 const { runTimeOffEvents, installationStore } = require('./app/helper');
-const { getTable } = require('./app/db');
+const { getTable, db } = require('./app/db');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 // Initializes your app with your bot token and signing secret
 
 
-const db = getTable();
+const database = getTable(db);
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   clientId: process.env.SLACK_CLIENT_ID,
@@ -28,7 +28,7 @@ const app = new App({
       },
     }
   ],
-  installationStore: installationStore(db)
+  installationStore: installationStore(database)
   /*socketMode: true,
   appToken: process.env.APP_TOKEN,*/
 });

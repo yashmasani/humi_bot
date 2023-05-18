@@ -1,29 +1,22 @@
 const sqlite3 = require('sqlite3').verbose();
+const dbFile = process.env.NODE_ENV === 'production' ? process.env.DB : ':memory:';
+const db = new sqlite3.Database(dbFile || ':memory:');
 
-function getTable() {
+function getTable(db) {
   return new Promise((resolve, reject) => {
-    const dbFile = process.env.NODE_ENV === 'production' ? process.env.DB : ':memory:';
-    const db = new sqlite3.Database(dbFile || ':memory:', function(err) {
-      if (err) {
-        console.error(err);
-        resolve(undefined);
-      } else {
-        db.run(`
-          CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY NOT NULL,
-            installation TEXT NOT NULL,
-            team_id TEXT NOT NULL,
-            channel TEXT
-          )`, function(err) {
-            if (err) {
-              console.error(err);
-              reject('Unable to create table');
-            } else {
-              resolve(db);
-            };
-          }
-        );
-      }
+    db.run(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY NOT NULL,
+        installation TEXT NOT NULL,
+        team_id TEXT NOT NULL,
+        channel TEXT
+      )`, function(err) {
+        if (err) {
+          console.error(err);
+          reject('Unable to create table');
+        } else {
+          resolve(db);
+        };
     });
   });
 }
@@ -85,6 +78,7 @@ function delInstall(db, teamId) {
 
 
 module.exports = {
+  db,
   getTable,
   saveInstall,
   getInstall,
