@@ -49,8 +49,7 @@ async function postChatMessage(date, app) {
         // const timeOff = ['test'];
         if (timeOff.length > 0 ) {
           const post_at = schedule(date, SCHEDULE);
-          const { installation } = await getInstall(db, process.env.TEAM_ID);
-          const { bot }  = installation;
+          const { bot } = await getInstall(db, process.env.TEAM_ID);
           if (!bot && !bot.token) {
             throw new Error('Bot Token not found');
           };
