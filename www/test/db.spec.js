@@ -6,6 +6,7 @@ const {
   getInstall,
   delInstall
 } = require('../app/db')
+const { mockInstallObject } = require('./mocks');
 
 describe('DB', function() {
   it('get table', async function() {
@@ -19,23 +20,6 @@ describe('DB', function() {
     );
   });
   describe('installs', function() {
-      const mockInstallObject = {
-        team: { id: 'T012345678', name: 'example-team-name' },
-        enterprise: undefined,
-        user: { token: undefined, scopes: undefined, id: 'U01234567' },
-        tokenType: 'bot',
-        isEnterpriseInstall: false,
-        appId: 'A01234567',
-        authVersion: 'v2',
-        bot: {
-          scopes: [
-            'chat:write',
-          ],
-          token: 'xoxb-244493-28244493123-as123etsetts',
-          userId: 'U012345678',
-          id: 'B01234567'
-        }
-      };
     it('saveInstall', async function(){
       const database = await getTable(db);
       await saveInstall(database, mockInstallObject);
@@ -64,7 +48,6 @@ describe('DB', function() {
       await saveInstall(database, mockInstallObject);
       const installationObject = await getInstall(database, mockInstallObject.team.id);
       assert.equal(installationObject.team.id, mockInstallObject.team.id);
-      console.log(mockInstallObject.team.id);
       const res = await delInstall(database, mockInstallObject.team.id);
       assert.equal(res, true);
     });
