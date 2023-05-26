@@ -42,5 +42,8 @@ async function authenticate(page) {
   }
 }
 
+async function signOut(page) {
+
+}
 
 module.exports = init;
