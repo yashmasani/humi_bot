@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const { sleep } = require('./scheduler')
 require("dotenv").config();
 
 async function init(webAddress) {
@@ -13,7 +14,8 @@ async function init(webAddress) {
   await authenticate(page)
     .then(async () => {
       try {
-        await page.waitForNavigation({waitUntil: 'networkidle0', timeout: 8000 })
+        await page.waitForNavigation({waitUntil: 'networkidle0', timeout: 8000 });
+        await sleep(20000);
       } catch(e) {
         console.error(e);
       }
@@ -43,7 +45,7 @@ async function authenticate(page) {
 }
 
 async function signOut(page) {
-
+  
 }
 
 module.exports = init;
