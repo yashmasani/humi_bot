@@ -13,19 +13,10 @@ RUN curl -LO https://github.com/yashmasani/humi_bot/archive/refs/heads/main.zip
 RUN mkdir ./humi_bot-main
 RUN unzip main.zip -d ./
 RUN rm -rf main.zip
-RUN ls ./humi_bot-main
 RUN cd humi_bot-main
 WORKDIR humi_bot-main
-#COPY humi_bot-main/src ./src
-#COPY humi_bot-main/Cargo.toml ./Cargo.toml
 RUN wasm-pack build --target nodejs --release
-#RUN mkdir www
-# COPY www/app ./www/app
-# COPY www/app.js ./www/app.js
-# COPY www/package.json ./www/package.json
-# COPY www/package-lock.json ./www/package-lock.json
-# 
-#RUN
+
 FROM node:16.17.0-bullseye-slim
 COPY --from=wasm-builder humi_bot-main /bot
 RUN cd bot
@@ -33,7 +24,7 @@ WORKDIR bot
 RUN cd www
 WORKDIR www
 
-RUN --mount=type=cache,target=./.cache npm ci
+RUN npm ci
 EXPOSE 8100
 RUN apt-get update \
     && apt-get install -y wget gnupg \
