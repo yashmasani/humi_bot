@@ -12,11 +12,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@slack/bolt": "^3.8.1",
+    "@slack/bolt": "^3.13.0",
     "dayjs": "^1.11.7",
     "node-fetch": "^2.6.7",
     "puppeteer": "^19.8.5",
     "rewire": "^6.0.0",
+    "sqlite3": "^5.1.6",
     "wasm-build": "file:../pkg"
   },
   "devDependencies": {

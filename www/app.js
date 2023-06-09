@@ -3,33 +3,34 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 require("dotenv").config();
-const { runTimeOffEvents } = require('./app/helper');
+const { runTimeOffEvents, installationStore } = require('./app/helper');
+const { getTable, db } = require('./app/db');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 // Initializes your app with your bot token and signing secret
+
+
+const database = getTable(db);
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
+  clientId: process.env.SLACK_CLIENT_ID,
+  clientSecret: process.env.SLACK_CLIENT_SECRET,
+  stateSecret: process.env.SLACK_STATE_SECRET,
+  scopes: ['app_mentions:read', 'chat:write', 'commands'],
+  customRoutes: [
+    {
+      path: '/health-check',
+      method: ['GET'],
+      handler: (req, res) => {
+        res.writeHead(200);
+        res.end(`Things are going just fine at ${req.headers.host}!`);
+      },
+    }
+  ],
+  installationStore: installationStore(database)
   /*socketMode: true,
   appToken: process.env.APP_TOKEN,*/
-});
-
-//events
-app.event('app_home_append',async ({event})=>{
-  console.log(event,1); 
-});
-
-//Mention Hi, say Hi
-
-app.event('app_mention', async ({event, client})=> {
-  try{
-     if (event.text.includes('Hi')) {
-        client.chat.postMessage({"channel":event.channel, "text":"Hi"})
-     }
-  } catch(e){
-    console.log(e);
-  };
 });
 
 // commands

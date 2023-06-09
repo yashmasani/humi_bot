@@ -34,6 +34,9 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
+      mockModule.__set__('getInstall', () =>({
+        bot: { token : 1 }
+      }));
       let isCalled = false;
       const mockApp = {
         client: {
@@ -53,6 +56,9 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
+      mockModule.__set__('getInstall', () =>({
+        bot: { token : 1 }
+      }));
       let isCalled = false;
       const mockApp = {
         client: {
@@ -67,6 +73,28 @@ describe('Run Time Off Events', function() {
       });
     });
   });
+    it('fails when bot installation is not found', async function() {
+      mockModule.__set__('navigate', () => (slp(100)));
+      mockModule.__set__('validateWebScrapingTime', () => (true))
+      mockModule.__set__('schedule', mockFunction);
+      mockModule.__set__('find_today', () => ['']);
+      mockModule.__set__('render_mkdown', () => 'test');
+      mockModule.__set__('getInstall', () =>({}));
+      let isCalled = false;
+      const mockApp = {
+        client: {
+          chat: {
+            scheduleMessage: () => slp(10, () => { isCalled = true; })
+          }
+        }
+      };
+      const date = {};
+      return mockModule.postChatMessage(date, mockApp).then(() => {
+        assert.fail('chat message called even when team does not exist');
+      }).catch((_) => {
+        assert.equal(isCalled, false, 'schedule Message threw an error when bot token was not found');
+      });
+    });
   describe('runTimeOffEvents works', function() {
     it('RunTime Off Events is called as expected when target time is before 8', async function() {
       let isCalledCount = 0;
@@ -78,6 +106,9 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
       mockModule.__set__('setInterval', mockSetInterval);
+      mockModule.__set__('getInstall', () =>({
+        bot: { token : 1 }
+      }));
       const mockApp = {
         client: {
           chat: {
@@ -107,6 +138,9 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
       mockModule.__set__('setInterval', mockSetInterval);
+      mockModule.__set__('getInstall', () =>({
+        bot: { token : 1 }
+      }));
       const mockApp = {
         client: {
           chat: {
@@ -131,6 +165,9 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
       mockModule.__set__('setInterval', mockSetInterval);
+      mockModule.__set__('getInstall', () =>({
+        bot: { token : 1 }
+      }));
       const mockApp = {
         client: {
           chat: {
