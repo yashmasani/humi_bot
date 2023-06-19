@@ -96,6 +96,7 @@ describe('Run Time Off Events', function() {
       });
     });
   describe('runTimeOffEvents works', function() {
+    mockModule.__set__('process.env', {});
     it('RunTime Off Events is called as expected when target time is before 8', async function() {
       let isCalledCount = 0;
       const mockNavInterval = 100;
@@ -125,6 +126,39 @@ describe('Run Time Off Events', function() {
       await slp(mockTimeInterval+mockNavInterval+buffer);
       assert.equal(isCalledCount, 2);
       await slp(mockTimeInterval+mockNavInterval+buffer);
+      assert.equal(isCalledCount, 3);
+      clearInterval(interv);
+    });
+    it('RunTime Off Events is called as expected when target time is before 8 where email two exists', async function() {
+      let isCalledCount = 0;
+      const mockNavInterval = 50;
+      mockModule.__set__('process.env', { EMAIL_TWO: 'test' });
+      mockModule.__set__('navigate', () => (slp(mockNavInterval)));
+      mockModule.__set__('calculateInterval', () => (500));
+      mockModule.__set__('validateWebScrapingTime', () => (true))
+      mockModule.__set__('schedule', mockFunction);
+      mockModule.__set__('find_today', () => ['']);
+      mockModule.__set__('render_mkdown', () => 'test');
+      mockModule.__set__('setInterval', mockSetInterval);
+      mockModule.__set__('getInstall', () =>({
+        bot: { token : 1 }
+      }));
+      const mockApp = {
+        client: {
+          chat: {
+            scheduleMessage: () => slp(10, () => { isCalledCount += 1; })
+          }
+        }
+      };
+      const buffer = 50;
+      // less than target time
+      const mockStartTime = { hour: () => (2) };
+      const mockTimeInterval = 500;
+      const interv = await mockModule.runTimeOffEvents(mockApp, mockStartTime, mockTimeInterval);
+      assert.equal(isCalledCount, 1);
+      await slp(mockTimeInterval+(mockNavInterval * 2)+buffer);
+      assert.equal(isCalledCount, 2);
+      await slp(mockTimeInterval+(mockNavInterval * 2)+buffer);
       assert.equal(isCalledCount, 3);
       clearInterval(interv);
     });
