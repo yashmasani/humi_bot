@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const { sleep } = require('./scheduler')
 require("dotenv").config();
 
-async function init(webAddress) {
+async function init(webAddress, email, password) {
   const browser = await puppeteer.launch({
     headless: true,
     args: ['--no-sandbox']
@@ -11,7 +11,7 @@ async function init(webAddress) {
 
   await page.goto(webAddress);
   
-  await authenticate(page)
+  await authenticate(page, email, password)
     .then(async () => {
       try {
         await page.waitForNavigation({waitUntil: 'networkidle0', timeout: 8000 });
@@ -28,12 +28,12 @@ async function init(webAddress) {
   return content;
 }
 
-async function authenticate(page) {
+async function authenticate(page, EMAIL, PASSWORD) {
   let email = await page.$('input[name="email"]');
   let password = await page.$('input[name="password"]');
   if (email && password) {
-    await email.type(process.env.EMAIL);
-    await password.type(process.env.PASSWORD);
+    await email.type(EMAIL);
+    await password.type(PASSWORD);
     const submit = await page.$('button[type="submit"]');
     if (submit) {
       await submit.click();
