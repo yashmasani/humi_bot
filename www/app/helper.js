@@ -44,8 +44,13 @@ async function runTimeOffEvents(app, startTime, timeInterval) {
 async function postChatMessage(date, app) {
     if (validateWebScrapingTime(date)) {
       try {
-        const html = await navigate('https://hr.humi.ca/login');
-        const timeOff = render_mkdown(html);
+        const html = await navigate('https://hr.humi.ca/login', process.env.EMAIL, process.env.PASSWORD);
+        let timeOff = render_mkdown(html);
+        if (process.env.EMAIL_TWO) {
+          const htmlTwo = await navigate('https://hr.humi.ca/login', process.env.EMAIL_TWO, process.env.PASSWORD_TWO);
+          timeOff += render_mkdown(htmlTwo);
+        }
+         
         // const timeOff = ['test'];
         if (timeOff.length > 0 ) {
           const post_at = schedule(date, SCHEDULE);
