@@ -1,3 +1,4 @@
+use std::assert;
 use wasm_bindgen::prelude::*;
 use tl::*;
 use serde::{Serialize, Deserialize};
@@ -6,18 +7,20 @@ use js_sys::Date;
 
 const TODAY:&str = "Today";
 
-const EMOTES_TRAVEL: [&str; 4] = [
+const EMOTES_TRAVEL: [&str; 5] = [
     "\u{1F6EC}",
     "\u{1FA82}",
     "\u{1F681}",
-    "\u{1F680}"
+    "\u{1F680}",
+    "\u{1F68C}",
 ];
 
-const EMOTES: [&str; 4] = [
+const EMOTES: [&str; 5] = [
     "\u{1F3DD}",
     "\u{1F305}",
     "\u{1F306}",
-    "\u{2600}"
+    "\u{2600}",
+    "\u{1F3DE}"
 ];
 /*
  * Returns an array of TimeOffDescription
@@ -48,9 +51,10 @@ pub fn render_mkdown(input: &str) -> Result<String, JsValue>{
     let time_off = parse(input).unwrap_throw();
     let mut mkdown = String::new();
     const SEARCH_TERM: &str = "is away";
-    let rand_iter = vec![1, 2, 3, 4];
-    let rand = random(1, 4, Date::new_0().get_day());
-    let mut rand_index = rand_iter.iter().position(|x| *x == rand).unwrap_or(0);
+    let rand = random(1, 5, Date::new_0().get_seconds());
+    assert!(EMOTES_TRAVEL.len() == EMOTES.len());
+    let mut rand_index:usize = (rand-1) as usize;
+    assert!(rand_index <= EMOTES.len());
     for person in time_off {
         let name = person.name.as_str().split(SEARCH_TERM).nth(0);
         let time_away = person.time_away;
@@ -65,7 +69,7 @@ pub fn render_mkdown(input: &str) -> Result<String, JsValue>{
             mkdown.push_str("\n");
         }
         rand_index += 1;
-        if rand_index == rand_iter.len() {
+        if rand_index == EMOTES.len() {
             rand_index = 0;
         }
     }
@@ -228,6 +232,9 @@ mod tests {
         assert_eq!(actual, expect);
         let actual = random(1, 10, 5);
         let expect = 5;
+        assert_eq!(actual, expect);
+        let actual = random(1, 5, 52);
+        let expect = 4;
         assert_eq!(actual, expect);
     }
 }
