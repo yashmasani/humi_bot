@@ -6,9 +6,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@nightly
         with:
-          toolchain: 'nightly 1.71'
+          toolchain: '1.71'
           targets: wasm32-unknown-unknown
       - name: Build Rust
         run: cargo build --verbose
