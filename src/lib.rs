@@ -1,4 +1,3 @@
-use std::assert;
 use wasm_bindgen::prelude::*;
 use tl::*;
 use serde::{Serialize, Deserialize};
@@ -52,9 +51,7 @@ pub fn render_mkdown(input: &str) -> Result<String, JsValue>{
     let mut mkdown = String::new();
     const SEARCH_TERM: &str = "is away";
     let rand = random(1, 5, Date::new_0().get_seconds());
-    assert!(EMOTES_TRAVEL.len() == EMOTES.len());
     let mut rand_index:usize = (rand-1) as usize;
-    assert!(rand_index <= EMOTES.len());
     for person in time_off {
         let name = person.name.as_str().split(SEARCH_TERM).nth(0);
         let time_away = person.time_away;
