@@ -19,6 +19,9 @@ wasm-pack build --target nodejs --release
 
 cd www
 npm install
+if [ $1 = "test" ]
+then npm test
+fi
 if [ $1 = "prod" ]
   then
     npm run prod
