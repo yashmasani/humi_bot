@@ -8,7 +8,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: 'nightly-2023-05-18'
+          toolchain: 'nightly-2023-04-06'
           targets: wasm32-unknown-unknown
       - name: Build Rust
         run: cargo build --verbose
