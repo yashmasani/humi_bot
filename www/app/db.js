@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const dbFile = process.env.NODE_ENV === 'production' ? process.env.DB : ':memory:';
-const db = new sqlite3.Database(dbFile || ':memory:');
+const database = () => new sqlite3.Database(dbFile || ':memory:');
 
 function getTable(db) {
   return new Promise((resolve, reject) => {
@@ -76,11 +76,20 @@ function delInstall(db, teamId) {
   });
 }
 
+function handleConnection(database, fn, ...restArgs) {
+  try {
+    const db = database();
+    return fn(db, ...restArgs);
+  } catch(e) {
+    console.error(e);
+  }
+}
 
 module.exports = {
-  db,
+  database,
   getTable,
   saveInstall,
   getInstall,
-  delInstall
+  delInstall,
+  handleConnection
 }

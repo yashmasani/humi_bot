@@ -1,10 +1,11 @@
 const navigate = require('./navigate');
 const { schedule, validateWebScrapingTime, calculateInterval, sleep } = require('./scheduler');
 const {
-  db,
+  database,
   saveInstall,
   getInstall,
-  delInstall
+  delInstall,
+  handleConnection
 } = require('./db');
 const { find_today, render_mkdown } = require("wasm-build");
 
@@ -54,7 +55,7 @@ async function postChatMessage(date, app) {
         // const timeOff = ['test'];
         if (timeOff.length > 0 ) {
           const post_at = schedule(date, SCHEDULE);
-          const { bot } = await getInstall(db, process.env.TEAM_ID);
+          const { bot } = await handleConnection(database, getInstall, process.env.TEAM_ID);
           if (!bot && !bot.token) {
             throw new Error('Bot Token not found');
           };
@@ -76,13 +77,12 @@ async function postChatMessage(date, app) {
     }
 }
 
-const installationStore = (db) => ({
+const installationStore = (database) => ({
     storeInstallation: async (installation) => {
       // Bolt will pass your handler an installation object
       if (installation.team !== undefined) {
         // single team app installation
-        const database = await db;
-        return await saveInstall(database, installation);
+        return handleConnection(database, saveInstall, installation);
       }
       throw new Error('Failed saving installation data to installationStore');
     },
@@ -90,16 +90,14 @@ const installationStore = (db) => ({
       // Bolt will pass your handler an installQuery object
       if (installQuery.teamId !== undefined) {
         // single team app installation lookup
-        const database = await db;
-        return await getInstall(database, installQuery.teamId);
+        return handleConnection(database, getInstall, installQuery.teamId)
       }
       throw new Error('Failed fetching installation');
     },
     deleteInstallation: async (installQuery) => {
       if (installQuery.teamId !== undefined) {
         // single team app installation deletion
-        const database = await db;
-        return await delInstall(database, installQuery.teamId);
+        return handleConnection(database, delInstall, installQuery.teamId);
       }
       throw new Error('Failed to delete installation');
     }
