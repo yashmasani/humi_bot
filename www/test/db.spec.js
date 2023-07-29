@@ -1,6 +1,6 @@
 const assert = require('node:assert').strict;
 const {
-  db,
+  database,
   getTable,
   saveInstall,
   getInstall,
@@ -10,30 +10,33 @@ const { mockInstallObject } = require('./mocks');
 
 describe('DB', function() {
   it('get table', async function() {
-    const database = await getTable(db);
-    assert.notEqual(database, undefined);
-    await database.get(
+    const db = database();
+    const table = await getTable(db);
+    assert.notEqual(table, undefined);
+    await table.get(
       'SELECT * FROM users',
       function(err, row) {
         assert.ifError(err);
       }
     );
+    db.close(); 
   });
   describe('installs', function() {
+    let db = database();
     it('saveInstall', async function(){
-      const database = await getTable(db);
-      await saveInstall(database, mockInstallObject);
-      await database.get('SELECT * FROM users', function(err, row) {
+      const dbInstance = await getTable(db);
+      await saveInstall(dbInstance, mockInstallObject);
+      await dbInstance.get('SELECT * FROM users', function(err, row) {
         assert.equal(row.id, 1, 'row ID error');
         assert.equal(row.channel, null, 'channel should not be populated');
         assert.equal(row.installation, JSON.stringify(mockInstallObject));
       });
     });
     it('getInstall', async function(){
-      const database = await getTable(db);
-      await saveInstall(database, mockInstallObject);
+      const dbInstance = await getTable(db);
+      await saveInstall(dbInstance, mockInstallObject);
       const parsedMockInstallationObj = JSON.parse(JSON.stringify(mockInstallObject));
-      const installationObject = await getInstall(database, parsedMockInstallationObj.team.id);
+      const installationObject = await getInstall(dbInstance, parsedMockInstallationObj.team.id);
       assert.equal(Object.keys(parsedMockInstallationObj).length, Object.keys(installationObject).length);
       for (const key of Object.keys(parsedMockInstallationObj)) {
         if (typeof parsedMockInstallationObj[key] === 'object') {
@@ -44,11 +47,11 @@ describe('DB', function() {
       }
     });
     it('delInstall', async function(){
-      const database = await getTable(db);
-      await saveInstall(database, mockInstallObject);
-      const installationObject = await getInstall(database, mockInstallObject.team.id);
+      const dbInstance = await getTable(db);
+      await saveInstall(dbInstance, mockInstallObject);
+      const installationObject = await getInstall(dbInstance, mockInstallObject.team.id);
       assert.equal(installationObject.team.id, mockInstallObject.team.id);
-      const res = await delInstall(database, mockInstallObject.team.id);
+      const res = await delInstall(dbInstance, mockInstallObject.team.id);
       assert.equal(res, true);
     });
     after(function(){
@@ -58,14 +61,7 @@ describe('DB', function() {
           assert.ifError(err);
         }
       });
-    });
-  });
-  after(function(){
-    db.run('DROP TABLE IF EXISTS users', function(err){
-      if (err) {
-        console.error(err);
-        assert.ifError(err);
-      }
+      db.close();
     });
   });
 });
