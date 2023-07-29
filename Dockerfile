@@ -5,7 +5,8 @@ FROM rust:1.69 as wasm-builder
 LABEL maintainer="https://github.com/yashmasani"
 
 RUN rustup target add wasm32-unknown-unknown
-RUN rustup default nightly 
+RUN rustup toolchain install nightly-2023-04-06 --force
+RUN rustup default nightly-2023-04-06
 RUN cargo install wasm-pack
 WORKDIR /bot
 COPY src ./src
