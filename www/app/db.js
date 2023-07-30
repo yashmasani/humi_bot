@@ -76,13 +76,50 @@ function delInstall(db, teamId) {
   });
 }
 
-function handleConnection(database, fn, ...restArgs) {
+async function handleConnection(database, fn, ...restArgs) {
   try {
     const db = database();
-    return fn(db, ...restArgs);
+    const ret = await fn(db, ...restArgs);
+    db.close();
+    return ret;
   } catch(e) {
     console.error(e);
   }
+}
+
+function getLogTable(db) {
+  return new Promise((resolve, reject) => {
+    db.run(`
+      CREATE TABLE IF NOT EXISTS Logs(
+        id INTEGER PRIMARY KEY,
+        content TEXT,
+        log_date TEXT DEFAULT date('now','localtime')
+        createdAt INTEGER DEFAULT unixepoch()
+      )
+    `, function(err) {
+        if (err) {
+          console.error(err);
+          reject('Unable to create Logs table');
+        } else {
+          resolve(db);
+        };
+    })
+  });
+}
+
+function storeLog(db, { content, date }) {
+  return new Promise((resolve, reject) => {
+    db.run(`
+      INSERT INTO(content, log_date) VALUES(?, ?)
+    `, content, date, function(err) {
+        if (err) {
+          console.error(err);
+          reject(`Unable to insert content: ${content} and date: ${date}`);
+        } else {
+          resolve(db);
+        };
+    })
+  });
 }
 
 module.exports = {
@@ -91,5 +128,7 @@ module.exports = {
   saveInstall,
   getInstall,
   delInstall,
-  handleConnection
+  handleConnection,
+  getLogTable,
+  storeLog
 }
