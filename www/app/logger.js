@@ -1,6 +1,9 @@
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 const {
   database,
   handleConnection,
@@ -16,7 +19,7 @@ class Logger {
   }
   async store(content) {
     //storeLog
-    const date = dayjs().tz('America/Toronto');
+    const date = dayjs().tz('America/Toronto').format('YYYY-MM-DD');
     await handleConnection(database, storeLog, {
       content,
       date
@@ -40,6 +43,9 @@ class Logger {
   }
 }
 
-const Log = new Logger();
+const log = new Logger();
 
-module.exports = Log;
+module.exports = {
+  log,
+  Logger
+};

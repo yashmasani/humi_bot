@@ -4,9 +4,17 @@ const {
   getTable,
   saveInstall,
   getInstall,
-  delInstall
+  delInstall,
+  getLogTable,
+  storeLog
 } = require('../app/db')
 const { mockInstallObject } = require('./mocks');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 describe('DB', function() {
   it('get table', async function() {
@@ -61,6 +69,33 @@ describe('DB', function() {
           assert.ifError(err);
         }
       });
+      db.close();
+    });
+  });
+  describe('Logger', () => {
+    let db = database();
+    beforeEach(() => {
+      db = database();
+    });
+    it('get table', async function() {
+      await getLogTable(db);
+      db.get('SELECT * FROM logs', function(err, row) {
+        assert.ifError(err); 
+      });
+    });
+    it('Log Content should be stored in Logs table', async function() {
+      await getLogTable(db);
+      await storeLog(db, { content: 'Test Log', date: undefined });
+      const date = dayjs().tz('America/Toronto').format('YYYY-MM-DD');
+      const epoc = Math.floor(Date.now() / 1000);
+      db.get('SELECT * FROM logs', function(err, row) {
+        assert.ifError(err);
+        assert.equal(row.content, 'Test Log');
+        assert.equal(row.log_date, date);
+        assert.equal(row.createdAt, epoc);
+      });
+    }); 
+    after(() => {
       db.close();
     });
   });

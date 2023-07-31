@@ -90,13 +90,12 @@ async function handleConnection(database, fn, ...restArgs) {
 function getLogTable(db) {
   return new Promise((resolve, reject) => {
     db.run(`
-      CREATE TABLE IF NOT EXISTS Logs(
+      CREATE TABLE IF NOT EXISTS logs (
         id INTEGER PRIMARY KEY,
         content TEXT,
-        log_date TEXT DEFAULT date('now','localtime')
-        createdAt INTEGER DEFAULT unixepoch()
-      )
-    `, function(err) {
+        log_date TEXT NOT NULL ON CONFLICT REPLACE DEFAULT (date('now','localtime')),
+        createdAt INTEGER DEFAULT (strftime('%s', 'now'))
+      )`, function(err) {
         if (err) {
           console.error(err);
           reject('Unable to create Logs table');
@@ -110,8 +109,9 @@ function getLogTable(db) {
 function storeLog(db, { content, date }) {
   return new Promise((resolve, reject) => {
     db.run(`
-      INSERT INTO(content, log_date) VALUES(?, ?)
-    `, content, date, function(err) {
+      INSERT INTO logs(content, log_date)
+      VALUES(?, NULL)
+    `,[content, date], function(err) {
         if (err) {
           console.error(err);
           reject(`Unable to insert content: ${content} and date: ${date}`);

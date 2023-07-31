@@ -5,7 +5,7 @@ const timezone = require('dayjs/plugin/timezone');
 require("dotenv").config();
 const { runTimeOffEvents, installationStore } = require('./app/helper');
 const { getTable, database, handleConnection } = require('./app/db');
-const logger = require('./app/logger')
+const { log } = require('./app/logger')
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -71,7 +71,7 @@ app.command('/time_off/attribution', async ({ ack, say })=>{
     const startTime = dayjs().tz('America/Toronto');
     // 24 hr in ms
     const timeInterval = 8.64e7;
-    logger.info(`Started at ${startTime}`);
+    log.info(`Started at ${startTime}`);
     runTimeOffEvents(app, startTime, timeInterval);
   } catch(e) {
     console.error(e);
