@@ -110,7 +110,7 @@ function storeLog(db, { content, date }) {
   return new Promise((resolve, reject) => {
     db.run(`
       INSERT INTO logs(content, log_date)
-      VALUES(?, NULL)
+      VALUES(?, ?)
     `,[content, date], function(err) {
         if (err) {
           console.error(err);
