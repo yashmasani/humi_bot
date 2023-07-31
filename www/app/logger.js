@@ -14,7 +14,6 @@ const {
 class Logger {
   constructor(){
     // getLogTable
-    console.log('a new Log instance has been made');
     handleConnection(database, getLogTable);
   }
   async store(content) {
@@ -27,7 +26,6 @@ class Logger {
   }
   async log(input) {
     await this.store(input);
-    console.log(input);
   }
   info(input) {
     this.log('[INFO]: '+ input);
