@@ -1,6 +1,11 @@
 const assert = require('node:assert').strict;
 const rewire = require('rewire');
 const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 async function slp(ms, fn) {
   return new Promise((resolve) => {
@@ -48,7 +53,7 @@ describe('Logger', function() {
     assert.equal(storeLoggedCalled, 1);
     assert.equal(storeLogArgs[0].constructor.name, 'Database');
     assert.equal(storeLogArgs[1].content, 'Test');
-    const date = dayjs(storeLogArgs[0].date).format('YYYY-MM-DD');
+    const date = dayjs(storeLogArgs[0].date).tz('America/Toronto').format('YYYY-MM-DD');
     assert.equal(storeLogArgs[1].date, date);
   });
 });
