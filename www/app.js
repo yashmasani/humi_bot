@@ -1,4 +1,4 @@
-const { App } = require("@slack/bolt");
+const { App, HTTPReceiver } = require("@slack/bolt");
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
@@ -11,13 +11,9 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 // Initializes your app with your bot token and signing secret
 
-handleConnection(database, getTable);
 
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
-  clientId: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET,
-  stateSecret: process.env.SLACK_STATE_SECRET,
   scopes: ['app_mentions:read', 'chat:write', 'commands'],
   customRoutes: [
     {
@@ -29,7 +25,27 @@ const app = new App({
       },
     }
   ],
-  installationStore: installationStore(database)
+  installationStore: installationStore(database),
+  receiver: new HTTPReceiver({
+    clientId: process.env.SLACK_CLIENT_ID,
+    clientSecret: process.env.SLACK_CLIENT_SECRET,
+    stateSecret: process.env.SLACK_STATE_SECRET,
+    dispatchErrorHandler: async ({ request, logger, error, response }) => {
+      logger.error(`dispatch error: ${error}`);
+      logger.info(JSON.stringify(request.headers));
+      response.writeHead(500);
+      response.end();
+    },
+    logger: {
+      debug: (...msgs) => { log.debug(JSON.stringify(msgs)); },
+      info: (...msgs) => { log.info(JSON.stringify(msgs)); },
+      warn: (...msgs) => { log.warn(JSON.stringify(msgs)); },
+      error: (...msgs) => { log.error(JSON.stringify(msgs)); },
+      setLevel: (level) => { },
+      getLevel: () => { },
+      setName: (name) => { },  
+    }
+  })
   /*socketMode: true,
   appToken: process.env.APP_TOKEN,*/
 });
@@ -66,6 +82,7 @@ app.command('/time_off/attribution', async ({ ack, say })=>{
 (async () => {
   const port = process.env.PORT || 3000;
   try {
+    await handleConnection(database, getTable);
     await app.start(process.env.PORT || port);
     console.log(`⚡️ Time off bot is running on port ${port}!`);
     const startTime = dayjs().tz('America/Toronto');
