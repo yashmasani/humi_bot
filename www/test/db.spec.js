@@ -86,7 +86,7 @@ describe('DB', function() {
     it('Log Content should be stored in Logs table', async function() {
       await getLogTable(db);
       await storeLog(db, { content: 'Test Log', date: undefined });
-      const date = dayjs().tz('America/Toronto').format('YYYY-MM-DD');
+      const date = dayjs().format('YYYY-MM-DD');
       const epoc = Math.floor(Date.now() / 1000);
       db.get('SELECT * FROM logs', function(err, row) {
         assert.ifError(err);
