@@ -99,10 +99,9 @@ pub fn parse(input: &str) -> Result<Vec<TimeOffDescription>, Box<dyn std::error:
         } else {
             continue;
         }
-        // find parent with today title
     }
     console::log_1(&"Could not find Parent Node".into());
-    Err("Could not find Parent Node".into())
+    Ok(Vec::new())
 }
 
 fn strip_comments(input: &str) -> String {
