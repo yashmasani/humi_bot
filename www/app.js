@@ -11,6 +11,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 // Initializes your app with your bot token and signing secret
 
+let TIMER = null;
 
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -48,10 +49,17 @@ const app = new App({
         path: '/log-activities',
         method: ['GET'],
         handler: async (req, res) => {
-          res.writeHead(200);
-          //res.end(`${req.headers.host}!`);
-          const logs = await handleConnection(database, provideLogs);
-          res.end(JSON.stringify(logs));
+          if (!TIMER) {
+            res.writeHead(200);
+            const logs = await handleConnection(database, provideLogs);
+            res.end(JSON.stringify(logs));
+            TIMER = setTimeout(() => { 
+              TIMER = null;
+            }, 10000);
+          } else {
+            res.writeHead(429);
+            res.end();
+          }
         },
       }
     ],
