@@ -8,7 +8,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: 'nightly-2023-04-06'
+          toolchain: 'nightly-2023-06-04'
           targets: wasm32-unknown-unknown
       - name: Build Rust
         run: cargo build --verbose
@@ -16,7 +16,7 @@ jobs:
         run: cargo test --verbose
       - name: Build Wasm
         run: |
-          cargo install wasm-pack --version='0.11.0'
+          cargo install wasm-pack --version='0.12.0'
           wasm-pack build --target nodejs --release
       - name: use Node 16
         uses: actions/setup-node@v3
