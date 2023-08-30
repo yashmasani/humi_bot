@@ -4,12 +4,12 @@ const dayjs = require('dayjs');
 const assert = require('node:assert').strict;
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
+const { Logger } = require('../app/logger');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const mockModule = rewire("../app/helper");
-
 
 async function slp(ms, fn) {
   return new Promise((resolve) => {
@@ -20,6 +20,11 @@ async function slp(ms, fn) {
   })
 }
 
+/* ----mock log storage---- */
+Logger.prototype.store = async () => { await slp(10); };
+const mockLog = new Logger();
+/* -----------------------  */
+
 function mockSetInterval(fn, ms) {
   return setInterval(fn, ms);
 }
@@ -27,6 +32,9 @@ function mockSetInterval(fn, ms) {
 
 describe('Run Time Off Events', function() {
   const mockFunction = () => {};
+  before(() => {
+      mockModule.__set__('log', mockLog);
+  });
   describe('post chat message works', function() {
     it('works when validateWebScrapingTime is true', async function() {
       mockModule.__set__('navigate', () => (slp(100)));
