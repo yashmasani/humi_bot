@@ -16,6 +16,7 @@ async function init(webAddress, email, password) {
       try {
         await page.waitForNavigation({waitUntil: 'networkidle0', timeout: 8000 });
         await sleep(20000);
+        await closeBlockingModals(page);
       } catch(e) {
         console.error(e);
       }
@@ -43,6 +44,12 @@ async function authenticate(page, EMAIL, PASSWORD) {
   } else {
     throw new Error(`Could not find input element EMAIL: ${email} or PASSWORD: ${password}`)
   }
+}
+
+async function closeBlockingModals(page) {
+  await page.keyboard.press('Escape');
+  //const close = await page.$('button[aria-label="Close"]');
+  //button aria-label="Close"
 }
 
 async function signOut(page) {
