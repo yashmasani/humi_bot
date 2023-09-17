@@ -49,7 +49,12 @@ const app = new App({
         path: '/log-activities',
         method: ['GET'],
         handler: async (req, res) => {
-          if (!TIMER) {
+           
+          const re = /.*\.github\.io/;
+          const isAllowed = re.test(req.headers.referer);
+          if (!TIMER && isAllowed) {
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
             res.writeHead(200);
             const logs = await handleConnection(database, provideLogs);
             res.end(JSON.stringify(logs));
