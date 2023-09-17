@@ -122,6 +122,22 @@ function storeLog(db, { content, date }) {
   });
 }
 
+function provideLogs(db) {
+  return new Promise((resolve, reject) => {
+    db.all(`
+      SELECT content, log_date, createdAt
+      FROM logs
+    `, function(err, rows) {
+        if (err) {
+          console.error(err);
+          reject(`Unable to get log data`);
+        } else {
+          resolve(rows);
+        };
+    })
+  });
+}
+
 module.exports = {
   database,
   getTable,
@@ -130,5 +146,6 @@ module.exports = {
   delInstall,
   handleConnection,
   getLogTable,
-  storeLog
+  storeLog,
+  provideLogs
 }
