@@ -30,17 +30,17 @@ async function init(webAddress, email, password) {
 }
 
 async function authenticate(page, EMAIL, PASSWORD) {
-  let email = await page.$('input[name="email"]');
+  let email = await page.$('input[name="username"]');
   let password = await page.$('input[name="password"]');
   if (email && password) {
     await email.type(EMAIL);
     await password.type(PASSWORD);
-    const submit = await page.$('button[type="submit"]');
+    await page.keyboard.press('Enter');
+    /*const submit = await page.$('button[type="submit"]');
     if (submit) {
-      await submit.click();
     } else {
       throw new Error(`Could not find input element SUBMIT: ${submit}`);
-    }
+    }*/
   } else {
     throw new Error(`Could not find input element EMAIL: ${email} or PASSWORD: ${password}`)
   }
