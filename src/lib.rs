@@ -48,13 +48,18 @@ pub fn random(start:u8, stop:u8, day_index: u32 ) -> u8 {
 #[wasm_bindgen]
 pub fn render_mkdown(input: &str) -> Result<String, JsValue>{
     let time_off = parse(input).unwrap_throw();
+    let formatted_post = create_post_format(&time_off);
+    Ok(formatted_post)
+}
+
+pub fn create_post_format(time_off: &Vec<TimeOffDescription>) -> String {
     let mut mkdown = String::new();
     const SEARCH_TERM: &str = "is away";
     let rand = random(1, 5, Date::new_0().get_seconds());
     let mut rand_index:usize = (rand-1) as usize;
     for person in time_off {
         let name = person.name.as_str().split(SEARCH_TERM).nth(0);
-        let time_away = person.time_away;
+        let time_away = &person.time_away;
         if let Some(n) = name {
             if time_away.contains("from") {
                 let emote = EMOTES_TRAVEL[rand_index];
@@ -70,10 +75,8 @@ pub fn render_mkdown(input: &str) -> Result<String, JsValue>{
             rand_index = 0;
         }
     }
-    Ok(mkdown)
+    mkdown
 }
-
-
 
 pub fn parse(input: &str) -> Result<Vec<TimeOffDescription>, Box<dyn std::error::Error>>{
     let new_input = strip_comments(input);
