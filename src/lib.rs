@@ -1,8 +1,12 @@
+pub mod calendar_parser;
+
+use chrono::{NaiveDate, format};
 use wasm_bindgen::prelude::*;
 use tl::*;
 use serde::{Serialize, Deserialize};
 use web_sys::console;
 use js_sys::Date;
+use calendar_parser::{ calendar_parser, date_now_est, CalendarErrors };
 
 const TODAY:&str = "Today";
 
@@ -136,6 +140,36 @@ impl TimeOffDescription {
             time_off = Some(TimeOffDescription { name, time_away });
         }
         time_off
+    }
+
+    fn get_name_from_summary(v:&str) -> String {
+        let mut f_name = String::new();
+        let mut s_name = String::new();
+        let sp = v.split_whitespace();
+        for (i, s) in sp.enumerate() {
+            if i == 0 {
+                f_name = s.to_string();
+            }
+            if i == 1 {
+                s_name = s.to_string();
+            }
+        }
+        format!("{} {}", f_name, s_name)
+    } 
+
+    fn get_time_away_from_summary(start_date: NaiveDate, end_date: NaiveDate, summary:&str) -> Option<String> {
+        let duration = end_date.signed_duration_since(start_date);
+        let fmt = format::StrftimeItems::new("%b %d");
+        dbg!("{}", duration);
+        if !duration.is_zero() && duration.num_days() > 1 {
+            Some(format!("Away from {} to {}", start_date.format_with_items(fmt.clone()), end_date.format_with_items(fmt.clone())))
+        } else {
+            let sp = summary.splitn(3, ' ').last();
+            match sp {
+                Some(s) => Some(s.to_string()),
+                None => None
+            }
+        } 
     }
 }
 
