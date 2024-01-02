@@ -4,6 +4,7 @@ use std::error;
 use std::error::Error;
 use std::fmt;
 
+
 pub fn date_now_est() -> Option<NaiveDate> {
     let now_utc = Utc::now();
     //let now_utc = NaiveDate::parse_from_str("20220728", "%Y%m%d").unwrap();
@@ -81,3 +82,113 @@ pub fn calendar_parser(input: &str, now_est: &NaiveDate) -> Result<Vec<TimeOffDe
     Ok(times)
 }
 
+#[cfg(test)]
+pub mod calendar_tests {
+    use super::*;
+    #[test]
+    fn parses_two_event_same_day() {
+        const PARSE_EXAMPLE:&str = r#"BEGIN:VCALENDAR
+        PRODID:Humi HR
+        VERSION:2.0
+        CALSCALE:GREGORIAN
+        BEGIN:VEVENT
+        UID:94ea4969da7b74f30e7dd915a038c801
+        DTSTAMP:20231227T181329Z
+        SUMMARY:Testle Testaf Sick Time leave for 1.00 day
+        DESCRIPTION:Reason: 
+        DTSTART;VALUE=DATE:20220728
+        DTEND;VALUE=DATE:20220729
+        END:VEVENT
+        BEGIN:VEVENT
+        UID:cb306d80e4eac4b135740987dd85de58
+        DTSTAMP:20231227T174333Z
+        SUMMARY:Testor Yoshtest Away
+        DESCRIPTION:
+        DTSTART;VALUE=DATE:20220728
+        DTEND;VALUE=DATE:20220805
+        END:VEVENT
+        "#;
+       
+        let date = NaiveDate::parse_from_str("20220728", "%Y%m%d").unwrap();
+
+        if let Ok(actual) = calendar_parser(&PARSE_EXAMPLE, &date) {
+            let expect:[TimeOffDescription; 2] = [TimeOffDescription { name: "Testle Testaf".to_string(), time_away: "Sick Time leave for 1.00 day".to_string() }, TimeOffDescription { name: "Testor Yoshtest".to_string(), time_away: "Away from Jul 28 to Aug 05".to_string()}];
+            assert_eq!(actual.len(), expect.len());
+            for i in 0..expect.len() {
+                assert_eq!(expect[i], actual[i]);
+            }
+        } else {
+            assert!(false);
+        };
+    }
+    
+    #[test]
+    fn only_select_events_for_particular_timstamp() {
+        const PARSE_EXAMPLE:&str = r#"BEGIN:VCALENDAR
+        PRODID:Humi HR
+        VERSION:2.0
+        CALSCALE:GREGORIAN
+        BEGIN:VEVENT
+        UID:94ea4969da7b74f30e7dd915a038c801
+        DTSTAMP:20231227T181329Z
+        SUMMARY:Testle Testaf Sick Time leave for 1.00 day
+        DESCRIPTION:Reason: 
+        DTSTART;VALUE=DATE:20220728
+        DTEND;VALUE=DATE:20220729
+        END:VEVENT
+        BEGIN:VEVENT
+        UID:cb306d80e4eac4b135740987dd85de58
+        DTSTAMP:20231227T174333Z
+        SUMMARY:Testor Yoshtest Away
+        DESCRIPTION:
+        DTSTART;VALUE=DATE:20220728
+        DTEND;VALUE=DATE:20220805
+        END:VEVENT
+        "#;
+        
+        let date = NaiveDate::parse_from_str("20220805", "%Y%m%d").unwrap();
+
+        if let Ok(actual) = calendar_parser(&PARSE_EXAMPLE, &date) {
+            let expect:[TimeOffDescription; 1] = [TimeOffDescription { name: "Testor Yoshtest".to_string(), time_away: "Away from Jul 28 to Aug 05".to_string()}];
+            assert_eq!(actual.len(), expect.len());
+            for i in 0..expect.len() {
+                assert_eq!(expect[i], actual[i]);
+            }
+        } else {
+            assert!(false);
+        };
+    }
+
+    #[test]
+    fn read_from_sample() {
+        let parse_example = std::fs::read_to_string("tests/calendar.ics").unwrap();
+        let date = NaiveDate::parse_from_str("20231215", "%Y%m%d").unwrap();
+
+        if let Ok(actual) = calendar_parser(&parse_example, &date) {
+            let expect:[TimeOffDescription; 4] = [
+                TimeOffDescription {
+                    name: "Employee 266".to_string(),
+                    time_away: "Away from Dec 14 to Dec 23".to_string(),
+                },
+                TimeOffDescription {
+                    name: "Employee 276".to_string(),
+                    time_away: "Away for 0.50 days".to_string(),
+                },
+                TimeOffDescription {
+                    name: "Employee 282".to_string(),
+                    time_away: "Away from Dec 15 to Dec 23".to_string(),
+                },
+                TimeOffDescription {
+                    name: "Employee 283".to_string(),
+                    time_away: "Away from Dec 01 to Dec 16".to_string(),
+                },
+            ];
+            assert_eq!(actual.len(), expect.len());
+            for i in 0..expect.len() {
+                assert_eq!(expect[i], actual[i]);
+            }
+        } else {
+            assert!(false);
+        };
+    }
+}

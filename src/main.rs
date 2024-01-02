@@ -1,4 +1,5 @@
 use lib::*;
+use lib::calendar_parser::calendar_parser;
 use std::fs;
 use std::{ thread, time };
 
@@ -13,4 +14,6 @@ fn main() {
     thread::sleep(ten_s);
     let x = lib::random(1, 4);
     println!("{x}");*/
+    let date = lib::calendar_parser::date_now_est().unwrap();
+    println!("{:?}", lib::calendar_parser::calendar_parser("test", &date));
 }
