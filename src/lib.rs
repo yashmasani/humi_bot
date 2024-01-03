@@ -1,8 +1,12 @@
+pub mod calendar_parser;
+
+use chrono::{NaiveDate, format};
 use wasm_bindgen::prelude::*;
 use tl::*;
 use serde::{Serialize, Deserialize};
 use web_sys::console;
 use js_sys::Date;
+use calendar_parser::{ calendar_parser, date_now_est, CalendarErrors };
 
 const TODAY:&str = "Today";
 
@@ -25,10 +29,12 @@ const EMOTES: [&str; 5] = [
  * Returns an array of TimeOffDescription
  * */
 #[wasm_bindgen]
-pub fn find_today(input: &str) -> Result<JsValue, JsValue> {
-    let raw_html = parse(input).unwrap_throw();
-    println!("{:?}", raw_html);
-    Ok(serde_wasm_bindgen::to_value(&raw_html)?)
+pub fn find_today(input: &str) -> Result<JsValue, JsError> {
+    //let raw_html = parse(input).unwrap_throw();
+    //println!("{:?}", raw_html);
+    let now_est = date_now_est().ok_or_else(|| Box::new(CalendarErrors::DateErr))?;
+    let raw = calendar_parser("test", &now_est).unwrap_throw();
+    Ok(serde_wasm_bindgen::to_value(&raw)?)
 }
 
 pub fn random(start:u8, stop:u8, day_index: u32 ) -> u8 {
@@ -48,13 +54,18 @@ pub fn random(start:u8, stop:u8, day_index: u32 ) -> u8 {
 #[wasm_bindgen]
 pub fn render_mkdown(input: &str) -> Result<String, JsValue>{
     let time_off = parse(input).unwrap_throw();
+    let formatted_post = create_post_format(&time_off);
+    Ok(formatted_post)
+}
+
+pub fn create_post_format(time_off: &Vec<TimeOffDescription>) -> String {
     let mut mkdown = String::new();
     const SEARCH_TERM: &str = "is away";
     let rand = random(1, 5, Date::new_0().get_seconds());
     let mut rand_index:usize = (rand-1) as usize;
     for person in time_off {
         let name = person.name.as_str().split(SEARCH_TERM).nth(0);
-        let time_away = person.time_away;
+        let time_away = &person.time_away;
         if let Some(n) = name {
             if time_away.contains("from") {
                 let emote = EMOTES_TRAVEL[rand_index];
@@ -70,10 +81,8 @@ pub fn render_mkdown(input: &str) -> Result<String, JsValue>{
             rand_index = 0;
         }
     }
-    Ok(mkdown)
+    mkdown
 }
-
-
 
 pub fn parse(input: &str) -> Result<Vec<TimeOffDescription>, Box<dyn std::error::Error>>{
     let new_input = strip_comments(input);
@@ -133,6 +142,36 @@ impl TimeOffDescription {
             time_off = Some(TimeOffDescription { name, time_away });
         }
         time_off
+    }
+
+    fn get_name_from_summary(v:&str) -> String {
+        let mut f_name = String::new();
+        let mut s_name = String::new();
+        let sp = v.split_whitespace();
+        for (i, s) in sp.enumerate() {
+            if i == 0 {
+                f_name = s.to_string();
+            }
+            if i == 1 {
+                s_name = s.to_string();
+            }
+        }
+        format!("{} {}", f_name, s_name)
+    } 
+
+    fn get_time_away_from_summary(start_date: NaiveDate, end_date: NaiveDate, summary:&str) -> Option<String> {
+        let duration = end_date.signed_duration_since(start_date);
+        let fmt = format::StrftimeItems::new("%b %d");
+        dbg!("{}", duration);
+        if !duration.is_zero() && duration.num_days() > 1 {
+            Some(format!("Away from {} to {}", start_date.format_with_items(fmt.clone()), end_date.format_with_items(fmt.clone())))
+        } else {
+            let sp = summary.splitn(3, ' ').last();
+            match sp {
+                Some(s) => Some(s.to_string()),
+                None => None
+            }
+        } 
     }
 }
 
