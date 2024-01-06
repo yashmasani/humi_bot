@@ -42,6 +42,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
+      mockModule.__set__('getTimeoffFromCalendar', () => 'test');
       mockModule.__set__('getInstall', () =>({
         bot: { token : 1 }
       }));
@@ -64,6 +65,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
+      mockModule.__set__('getTimeoffFromCalendar', () => 'test');
       mockModule.__set__('getInstall', () =>({
         bot: { token : 1 }
       }));
@@ -87,6 +89,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
+      mockModule.__set__('getTimeoffFromCalendar', () => 'test');
       mockModule.__set__('getInstall', () =>({}));
       let isCalled = false;
       const mockApp = {
@@ -114,6 +117,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
+      mockModule.__set__('getTimeoffFromCalendar', () => 'test');
       mockModule.__set__('setInterval', mockSetInterval);
       mockModule.__set__('getInstall', () =>({
         bot: { token : 1 }
@@ -147,6 +151,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
+      mockModule.__set__('getTimeoffFromCalendar', () => 'test');
       mockModule.__set__('setInterval', mockSetInterval);
       mockModule.__set__('getInstall', () =>({
         bot: { token : 1 }
@@ -180,6 +185,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
       mockModule.__set__('setInterval', mockSetInterval);
+      mockModule.__set__('getTimeoffFromCalendar', () => 'test');
       mockModule.__set__('getInstall', () =>({
         bot: { token : 1 }
       }));
@@ -206,6 +212,7 @@ describe('Run Time Off Events', function() {
       mockModule.__set__('schedule', mockFunction);
       mockModule.__set__('find_today', () => ['']);
       mockModule.__set__('render_mkdown', () => 'test');
+      mockModule.__set__('getTimeoffFromCalendar', () => 'test');
       mockModule.__set__('setInterval', mockSetInterval);
       mockModule.__set__('getInstall', () =>({
         bot: { token : 1 }

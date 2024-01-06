@@ -29,12 +29,13 @@ const EMOTES: [&str; 5] = [
  * Returns an array of TimeOffDescription
  * */
 #[wasm_bindgen]
-pub fn find_today(input: &str) -> Result<JsValue, JsError> {
+pub fn find_today(input: &str) -> Result<String, JsError> {
     //let raw_html = parse(input).unwrap_throw();
     //println!("{:?}", raw_html);
     let now_est = date_now_est().ok_or_else(|| Box::new(CalendarErrors::DateErr))?;
-    let raw = calendar_parser("test", &now_est).unwrap_throw();
-    Ok(serde_wasm_bindgen::to_value(&raw)?)
+    let time_off = calendar_parser(input, &now_est).unwrap_throw();
+    let formatted_post = create_post_format(&time_off);
+    Ok(formatted_post)
 }
 
 pub fn random(start:u8, stop:u8, day_index: u32 ) -> u8 {

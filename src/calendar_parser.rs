@@ -61,10 +61,19 @@ pub fn calendar_parser(input: &str, now_est: &NaiveDate) -> Result<Vec<TimeOffDe
                 dbg!("FOUND DTEND DATE: {}", is_end);
                 let start = NaiveDate::parse_from_str(&is_start, "%Y%m%d")?;
                 let end = NaiveDate::parse_from_str(&is_end, "%Y%m%d")?;
-                if start < end && *now_est >= start && *now_est <= end {
-                    let name = TimeOffDescription::get_name_from_summary(&summary);
-                    if let Some(time_away) = TimeOffDescription::get_time_away_from_summary(start, end, &summary) {
-                        times.push(TimeOffDescription { name, time_away }) 
+                if (end - start).num_days() == 1 {
+                    if start < end && *now_est >= start && *now_est < end {
+                        let name = TimeOffDescription::get_name_from_summary(&summary);
+                        if let Some(time_away) = TimeOffDescription::get_time_away_from_summary(start, end, &summary) {
+                            times.push(TimeOffDescription { name, time_away }) 
+                        }
+                    }
+                } else {
+                    if start < end && *now_est >= start && *now_est <= end {
+                        let name = TimeOffDescription::get_name_from_summary(&summary);
+                        if let Some(time_away) = TimeOffDescription::get_time_away_from_summary(start, end, &summary) {
+                            times.push(TimeOffDescription { name, time_away }) 
+                        }
                     }
                 }
             } else {
@@ -181,6 +190,27 @@ pub mod calendar_tests {
                 TimeOffDescription {
                     name: "Employee 283".to_string(),
                     time_away: "Away from Dec 01 to Dec 16".to_string(),
+                },
+            ];
+            assert_eq!(actual.len(), expect.len());
+            for i in 0..expect.len() {
+                assert_eq!(expect[i], actual[i]);
+            }
+        } else {
+            assert!(false);
+        };
+       
+        // check whether the parser will count time off from 11-12th as well
+        let date = NaiveDate::parse_from_str("20230112", "%Y%m%d").unwrap();
+        if let Ok(actual) = calendar_parser(&parse_example, &date) {
+            let expect:[TimeOffDescription; 2] = [
+                TimeOffDescription {
+                    name: "Employee 16".to_string(),
+                    time_away: "Away for 1.00 day".to_string(),
+                },
+                TimeOffDescription {
+                    name: "Employee 37".to_string(),
+                    time_away: "Sick Time leave for 1.00 day".to_string(),
                 },
             ];
             assert_eq!(actual.len(), expect.len());
