@@ -199,5 +199,26 @@ pub mod calendar_tests {
         } else {
             assert!(false);
         };
+       
+        // check whether the parser will count time off from 11-12th as well
+        let date = NaiveDate::parse_from_str("20230112", "%Y%m%d").unwrap();
+        if let Ok(actual) = calendar_parser(&parse_example, &date) {
+            let expect:[TimeOffDescription; 2] = [
+                TimeOffDescription {
+                    name: "Employee 16".to_string(),
+                    time_away: "Away for 1.00 day".to_string(),
+                },
+                TimeOffDescription {
+                    name: "Employee 37".to_string(),
+                    time_away: "Sick Time leave for 1.00 day".to_string(),
+                },
+            ];
+            assert_eq!(actual.len(), expect.len());
+            for i in 0..expect.len() {
+                assert_eq!(expect[i], actual[i]);
+            }
+        } else {
+            assert!(false);
+        };
     }
 }
