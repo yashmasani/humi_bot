@@ -12,10 +12,10 @@ async function getCalendar() {
       const response = await fetch(url.toString());
       body = await response.text();
     } else {
-      console.log('Not token found');
+      log.warn('Not token found');
     }
   } catch(e) {
-    console.log('fetch did not work');
+    log.error('fetch did not work');
   }
   return body;
 }
@@ -25,7 +25,6 @@ async function getTimeoffFromCalendar() {
   let timeoff = '';
   if (response) {
     timeoff = find_today(response);
-    console.log(timeoff);
   }
   return timeoff; 
 }

@@ -59,7 +59,6 @@ async function postChatMessage(date, app) {
          
         let timeOff = await getTimeoffFromCalendar();
         log.debug(timeOff);
-        // const timeOff = ['test'];
         if (timeOff.length > 0 ) {
           log.debug('Time off found');
           const post_at = schedule(date, SCHEDULE);
