@@ -15,5 +15,6 @@ fn main() {
     let x = lib::random(1, 4);
     println!("{x}");*/
     let date = lib::calendar_parser::date_now_est().unwrap();
-    println!("{:?}", lib::calendar_parser::calendar_parser("test", &date));
+    println!("{}", date.format("%Y-%m-%d").to_string());
+    //println!("{:?}", lib::calendar_parser::calendar_parser("test", &date));
 }

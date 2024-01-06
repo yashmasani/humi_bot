@@ -61,10 +61,19 @@ pub fn calendar_parser(input: &str, now_est: &NaiveDate) -> Result<Vec<TimeOffDe
                 dbg!("FOUND DTEND DATE: {}", is_end);
                 let start = NaiveDate::parse_from_str(&is_start, "%Y%m%d")?;
                 let end = NaiveDate::parse_from_str(&is_end, "%Y%m%d")?;
-                if start < end && *now_est >= start && *now_est <= end {
-                    let name = TimeOffDescription::get_name_from_summary(&summary);
-                    if let Some(time_away) = TimeOffDescription::get_time_away_from_summary(start, end, &summary) {
-                        times.push(TimeOffDescription { name, time_away }) 
+                if (end - start).num_days() == 1 {
+                    if start < end && *now_est >= start && *now_est < end {
+                        let name = TimeOffDescription::get_name_from_summary(&summary);
+                        if let Some(time_away) = TimeOffDescription::get_time_away_from_summary(start, end, &summary) {
+                            times.push(TimeOffDescription { name, time_away }) 
+                        }
+                    }
+                } else {
+                    if start < end && *now_est >= start && *now_est <= end {
+                        let name = TimeOffDescription::get_name_from_summary(&summary);
+                        if let Some(time_away) = TimeOffDescription::get_time_away_from_summary(start, end, &summary) {
+                            times.push(TimeOffDescription { name, time_away }) 
+                        }
                     }
                 }
             } else {
