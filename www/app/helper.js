@@ -7,7 +7,8 @@ const {
   delInstall,
   handleConnection
 } = require('./db');
-const { find_today, render_mkdown } = require("wasm-build");
+const { getTimeoffFromCalendar } = require('./api');
+const { render_mkdown } = require("wasm-build");
 const { log } = require('./logger');
 
 
@@ -50,7 +51,8 @@ async function postChatMessage(date, app) {
       log.info(`Valid Web Scraping Time: ${date.toString()}`);
       try {
         const html = await navigate('https://hr.humi.ca/login', process.env.EMAIL, process.env.PASSWORD);
-        let timeOff = render_mkdown(html);
+        //let timeOff = render_mkdown(html);
+        let timeOff = getTimeoffFromCalendar();
         if (process.env.EMAIL_TWO) {
           const htmlTwo = await navigate('https://hr.humi.ca/login', process.env.EMAIL_TWO, process.env.PASSWORD_TWO);
           timeOff += render_mkdown(htmlTwo);
