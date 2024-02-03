@@ -41,6 +41,7 @@ pub fn find_today(input: &str) -> Result<String, JsError> {
     let now_est = date_now_est().ok_or_else(|| Box::new(CalendarErrors::DateErr))?;
     let time_off = calendar_parser(input, &now_est).unwrap_throw();
     let time_off = PREV_TIMEOFF.with_borrow(|p| rate_limit(p, &time_off));
+    PREV_TIMEOFF.replace(time_off.clone());
     let formatted_post = create_post_format(&time_off);
     Ok(formatted_post)
 }
