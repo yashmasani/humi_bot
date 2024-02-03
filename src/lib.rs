@@ -1,5 +1,6 @@
 pub mod calendar_parser;
-
+use std::{borrow::Borrow, cell::RefCell};
+use std::thread::LocalKey;
 use chrono::{NaiveDate, format};
 use wasm_bindgen::prelude::*;
 use tl::*;
@@ -7,6 +8,10 @@ use serde::{Serialize, Deserialize};
 use web_sys::console;
 use js_sys::Date;
 use calendar_parser::{ calendar_parser, date_now_est, CalendarErrors };
+
+thread_local! {
+    pub static PREV_TIMEOFF: RefCell<Vec<TimeOffDescription>> = RefCell::new(vec![])
+}
 
 const TODAY:&str = "Today";
 
@@ -25,6 +30,7 @@ const EMOTES: [&str; 5] = [
     "\u{2600}",
     "\u{1F3DE}"
 ];
+
 /*
  * Returns an array of TimeOffDescription
  * */
@@ -34,6 +40,8 @@ pub fn find_today(input: &str) -> Result<String, JsError> {
     //println!("{:?}", raw_html);
     let now_est = date_now_est().ok_or_else(|| Box::new(CalendarErrors::DateErr))?;
     let time_off = calendar_parser(input, &now_est).unwrap_throw();
+    let time_off = PREV_TIMEOFF.with_borrow(|p| rate_limit(p, &time_off));
+    PREV_TIMEOFF.replace(time_off.clone());
     let formatted_post = create_post_format(&time_off);
     Ok(formatted_post)
 }
@@ -118,11 +126,40 @@ fn strip_comments(input: &str) -> String {
     input.replace("<!---->", "")
 }
 
-#[wasm_bindgen]
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+// limit messages i.e if previous person has longer than 1 day, don't spam everyday
+// unless grouped in with others
+pub fn rate_limit(prev_timeoff: &Vec<TimeOffDescription>, timeoff: &Vec<TimeOffDescription>) -> Vec<TimeOffDescription> {
+    let mut rated_timeoff: Vec<TimeOffDescription> = vec![];
+    if prev_timeoff.len() >= timeoff.len() {
+    // rate limit if timeoff is subset of prev
+        let is_subset = timeoff.iter().all(|x| prev_timeoff.iter().find(|p| *p == x).is_some());
+        if !is_subset {
+            for i in 0..timeoff.len() {
+                rated_timeoff.push(timeoff[i].clone());
+            }
+        } else {
+            let contains_single_day = timeoff.iter().any(|t| t.time_away.contains("Away for"));
+            // if it contains single day, then add all; 
+            if contains_single_day {
+                for i in 0..timeoff.len() {
+                    rated_timeoff.push(timeoff[i].clone());     
+                }
+            }
+        }
+    } else {
+
+        for i in 0..timeoff.len() {
+            rated_timeoff.push(timeoff[i].clone());
+        }
+    }
+    rated_timeoff 
+}
+
+//#[wasm_bindgen]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct TimeOffDescription {
-    name: String,
-    time_away: String
+    pub name: String,
+    pub time_away: String
 }
 
 impl TimeOffDescription {
@@ -272,6 +309,24 @@ mod tests {
         let actual = random(1, 5, 52);
         let expect = 4;
         assert_eq!(actual, expect);
+    }
+    #[test]
+    fn keep_all_if_single_day_exists() {
+        let today = vec![TimeOffDescription { name: "Long TestMan is away".to_string(), time_away: "Away from Apr 30 to May 07".to_string() }, TimeOffDescription { name: "Ctest Mtest is away".to_string(), time_away: "Away for 1.00 day".to_string() } ];
+        let prev = vec![TimeOffDescription { name: "Long TestMan is away".to_string(), time_away: "Away from Apr 30 to May 07".to_string() }, TimeOffDescription { name: "Ctest Mtest is away".to_string(), time_away: "Away for 1.00 day".to_string() } ];
+        let actual = rate_limit(&prev, &today);
+        let expect = [TimeOffDescription { name: "Long TestMan is away".to_string(), time_away: "Away from Apr 30 to May 07".to_string() }, TimeOffDescription { name: "Ctest Mtest is away".to_string(), time_away: "Away for 1.00 day".to_string() } ];
+        assert_eq!(actual.len(), expect.len());
+        assert_eq!(actual[0], expect[0]);
+    }
+    #[test]
+    fn limit_rate_for_same_bulk() {
+        let today = vec![TimeOffDescription { name: "Long TestMan is away".to_string(), time_away: "Away from Apr 30 to May 07".to_string() }, TimeOffDescription { name: "Test TestMan is away".to_string(), time_away: "Away from June 10 to June 14".to_string() } ];
+        let prev = vec![TimeOffDescription { name: "Long TestMan is away".to_string(), time_away: "Away from Apr 30 to May 07".to_string() }, TimeOffDescription { name: "Test TestMan is away".to_string(), time_away: "Away from June 10 to June 14".to_string() } ];
+        let actual = rate_limit(&prev, &today);
+        let expect:[TimeOffDescription; 0] = [];
+        assert_eq!(actual.len(), expect.len());
+        assert!(expect.is_empty());
     }
 }
 
