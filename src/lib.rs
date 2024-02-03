@@ -133,20 +133,21 @@ pub fn rate_limit(prev_timeoff: &Vec<TimeOffDescription>, timeoff: &Vec<TimeOffD
     if prev_timeoff.len() >= timeoff.len() {
     // rate limit if timeoff is subset of prev
         let is_subset = timeoff.iter().all(|x| prev_timeoff.iter().find(|p| *p == x).is_some());
-        println!("subst:::: {is_subset}");
         if !is_subset {
             for i in 0..timeoff.len() {
                 rated_timeoff.push(timeoff[i].clone());
             }
         } else {
-            // only single days when its a subset
-            for i in 0..timeoff.len() {
-                if !timeoff[i].time_away.contains("Away from"){
+            let contains_single_day = timeoff.iter().any(|t| t.time_away.contains("Away for"));
+            // if it contains single day, then add all; 
+            if contains_single_day {
+                for i in 0..timeoff.len() {
                     rated_timeoff.push(timeoff[i].clone());     
                 }
             }
         }
     } else {
+
         for i in 0..timeoff.len() {
             rated_timeoff.push(timeoff[i].clone());
         }
