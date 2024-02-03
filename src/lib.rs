@@ -311,13 +311,22 @@ mod tests {
         assert_eq!(actual, expect);
     }
     #[test]
-    fn limit_rate_for_single_day() {
-        let mut today = vec![TimeOffDescription { name: "Long TestMan is away".to_string(), time_away: "Away from Apr 30 to May 07".to_string() }, TimeOffDescription { name: "Ctest Mtest is away".to_string(), time_away: "Away for 1.00 day".to_string() } ];
+    fn keep_all_if_single_day_exists() {
+        let today = vec![TimeOffDescription { name: "Long TestMan is away".to_string(), time_away: "Away from Apr 30 to May 07".to_string() }, TimeOffDescription { name: "Ctest Mtest is away".to_string(), time_away: "Away for 1.00 day".to_string() } ];
         let prev = vec![TimeOffDescription { name: "Long TestMan is away".to_string(), time_away: "Away from Apr 30 to May 07".to_string() }, TimeOffDescription { name: "Ctest Mtest is away".to_string(), time_away: "Away for 1.00 day".to_string() } ];
-        let actual = rate_limit(&prev, &mut today);
-        let expect = [TimeOffDescription { name: "Ctest Mtest is away".to_string(), time_away: "Away for 1.00 day".to_string() }];
+        let actual = rate_limit(&prev, &today);
+        let expect = [TimeOffDescription { name: "Long TestMan is away".to_string(), time_away: "Away from Apr 30 to May 07".to_string() }, TimeOffDescription { name: "Ctest Mtest is away".to_string(), time_away: "Away for 1.00 day".to_string() } ];
         assert_eq!(actual.len(), expect.len());
         assert_eq!(actual[0], expect[0]);
+    }
+    #[test]
+    fn limit_rate_for_same_bulk() {
+        let today = vec![TimeOffDescription { name: "Long TestMan is away".to_string(), time_away: "Away from Apr 30 to May 07".to_string() }, TimeOffDescription { name: "Test TestMan is away".to_string(), time_away: "Away from June 10 to June 14".to_string() } ];
+        let prev = vec![TimeOffDescription { name: "Long TestMan is away".to_string(), time_away: "Away from Apr 30 to May 07".to_string() }, TimeOffDescription { name: "Test TestMan is away".to_string(), time_away: "Away from June 10 to June 14".to_string() } ];
+        let actual = rate_limit(&prev, &today);
+        let expect:[TimeOffDescription; 0] = [];
+        assert_eq!(actual.len(), expect.len());
+        assert!(expect.is_empty());
     }
 }
 
