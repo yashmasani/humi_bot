@@ -1,4 +1,3 @@
-const navigate = require('./navigate');
 const { schedule, validateWebScrapingTime, calculateInterval, sleep } = require('./scheduler');
 const {
   database,
@@ -50,13 +49,6 @@ async function postChatMessage(date, app) {
     if (validateWebScrapingTime(date)) {
       log.info(`Valid Web Scraping Time: ${date.toString()}`);
       try {
-        /**const html = await navigate('https://hr.humi.ca/login', process.env.EMAIL, process.env.PASSWORD);
-        let timeOff = render_mkdown(html);
-        if (process.env.EMAIL_TWO) {
-          const htmlTwo = await navigate('https://hr.humi.ca/login', process.env.EMAIL_TWO, process.env.PASSWORD_TWO);
-          timeOff += render_mkdown(htmlTwo);
-        }**/
-         
         let timeOff = await getTimeoffFromCalendar();
         log.debug(timeOff);
         if (timeOff.length > 0 ) {
